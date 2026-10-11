@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { goods } from "@/data/market.js";
-import ProductArt from "@/components/ProductArt.vue";
+import ProductArt from "@/components/ProductVisual.vue";
 const props = defineProps({ id: { type: String, required: true } });
 const product = computed(() =>
   goods.find((item) => String(item.id) === props.id),

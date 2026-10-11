@@ -104,78 +104,88 @@ function backToTop() {
     >
   </el-dialog>
 </template>
+
 <style scoped>
 .floating-dock {
   position: fixed;
-  right: 16px;
+  right: 17px;
   top: 50%;
   transform: translateY(-50%);
-  background: #fff;
-  border: 1px solid #efedf0;
-  box-shadow: 0 6px 25px #3530400a;
-  border-radius: 40px;
-  width: 64px;
-  padding: 10px 5px;
-  z-index: 30;
   display: flex;
   flex-direction: column;
-  gap: 5px;
   align-items: center;
+  gap: 5px;
+  z-index: 30;
+  background: #fffefaed;
+  border: 1px solid #e5e8dc;
+  border-radius: 14px;
+  backdrop-filter: blur(15px);
+  padding: 8px 5px;
+  width: 56px;
+  box-shadow: 0 6px 24px #3c4c2910;
 }
 .floating-dock > button,
 .dock-publish {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  font-size: 9px;
-  color: #96929b;
-  width: 100%;
+  gap: 6px;
+  font-size: 8px;
   padding: 11px 0;
-  border-radius: 18px;
+  border-radius: 8px;
+  width: 100%;
+  color: #9ba38d;
   transition:
     background 0.2s,
     color 0.2s;
 }
 .floating-dock > button:hover {
-  background: #fff0ee;
-  color: #ef4741;
+  background: #f3f3e9;
+  color: var(--accent);
+}
+.floating-dock > button svg {
+  width: 19px;
+  height: 19px;
 }
 .dock-publish {
-  padding: 0 0 9px;
-  color: #ef4741;
+  padding: 0 0 8px;
+  color: var(--accent);
 }
 .dock-publish > span {
-  background: #ef4741;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  height: 47px;
-  width: 47px;
-  color: white;
-  box-shadow: 0 5px 12px #ef474131;
-  transition: transform 0.2s;
+  width: 37px;
+  height: 37px;
+  border-radius: 10px;
+  background: #f4e9df;
+  border: 1px solid #ead6c5;
+  color: var(--accent);
+  transition: background 0.2s;
 }
 .dock-publish:hover > span {
-  transform: rotate(90deg);
+  background: #ecddd0;
+}
+.dock-publish > span svg {
+  width: 23px;
+  height: 23px;
 }
 .dock-publish b {
-  font-weight: 550;
-  font-size: 9px;
+  font-size: 8px;
+  font-weight: 450;
 }
 .dock-top {
-  border-top: 1px solid #f1eef1;
+  border-top: 1px solid var(--line);
   border-radius: 0 !important;
 }
 .dialog-note {
   font-size: 12px;
   line-height: 1.8;
-  color: #9c97a1;
+  color: #929a87;
 }
 .mobile-symbol {
   display: grid;
   place-items: center;
-  color: #ef4741;
+  color: var(--accent);
   padding: 20px;
 }
 .feedback-label {
@@ -183,27 +193,15 @@ function backToTop() {
   margin-bottom: 12px;
   font-size: 13px;
 }
-@media (max-width: 1400px) {
-  .floating-dock {
-    right: 8px;
-    width: 52px;
-  }
-  .dock-publish > span {
-    height: 39px;
-    width: 39px;
-  }
-  .floating-dock {
-    opacity: 0.97;
-  }
-}
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .floating-dock {
     top: auto;
     bottom: 18px;
-    transform: none;
     right: 14px;
-    padding: 6px;
-    width: 54px;
+    transform: none;
+    padding: 5px;
+    width: 47px;
+    border-radius: 12px;
   }
   .floating-dock > button {
     display: none;
@@ -212,7 +210,11 @@ function backToTop() {
     padding: 0;
   }
   .dock-publish b {
-    font-size: 8px;
+    font-size: 7px;
+  }
+  .dock-publish > span {
+    width: 35px;
+    height: 35px;
   }
 }
 </style>

@@ -98,10 +98,10 @@ const goods = await request.get('/goods', { params: { page: 1, size: 20 } })
 
 ## 首页 UI 与离线 Mock
 
-红色主题、浅灰背景、1200px 居中容器、220px 分类导航、渐变主推 Banner、2×2 推荐频道、浮动操作栏与自适应商品瀑布流。CSS 在各组件中使用 scoped 样式，小屏自动切换布局，支持键盘焦点与减少动画偏好。
+暖白背景、砖红强调色、1200px 居中容器、摄影主视觉、四个精选频道、轻量浮动操作栏与四列商品流。平板切换三列、手机切换两列；CSS 使用 scoped 样式，支持键盘焦点与减少动画偏好。
 
 - `src/data/market.js`：8 个分类、7 个热搜、4 个频道、15 件完整 Mock 商品及筛选函数。
-- `src/components/ProductArt.vue`：本地 SVG 商品插画，不加载远程图片、字体或 API。
+- `src/components/ProductVisual.vue`：优先展示 `public/images/` 的本地摄影风格素材，缺少素材或加载失败时回退到 `ProductArt.vue` 的 SVG 插画，不加载远程图片、字体或 API。素材来源与提示词见 [视觉素材说明](docs/visual-assets.md)。
 - `src/components/GoodsCard.vue`：成色、价格、卖家和悬停动效。
 - `src/components/FloatingDock.vue`：发布、消息、手机端说明、反馈与回到顶部。
 - `src/components/CategoryNav.vue`：悬停分类时在右侧展开分组商品类型；支持键盘焦点、Escape 关闭和触屏点击，小屏面板显示在分类下方。

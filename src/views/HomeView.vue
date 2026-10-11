@@ -1,15 +1,9 @@
 <script setup>
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import {
-  categories,
-  channels,
-  feedTabs,
-  goods,
-  filterGoods,
-} from "@/data/market.js";
+import { categories, channels, feedTabs, filterGoods } from "@/data/market.js";
 import MarketIcon from "@/components/MarketIcon.vue";
-import ProductArt from "@/components/ProductArt.vue";
+import ProductVisual from "@/components/ProductVisual.vue";
 import GoodsCard from "@/components/GoodsCard.vue";
 import FloatingDock from "@/components/FloatingDock.vue";
 import CategoryNav from "@/components/CategoryNav.vue";
@@ -34,10 +28,10 @@ const filtered = computed(() =>
     type: activeType.value,
   }),
 );
-const columnCount = ref(5);
+const columnCount = ref(4);
 function updateColumns() {
   const width = window.innerWidth;
-  columnCount.value = width > 1100 ? 5 : width > 800 ? 4 : width > 600 ? 3 : 2;
+  columnCount.value = width > 1000 ? 4 : width > 700 ? 3 : 2;
 }
 onMounted(() => {
   updateColumns();
@@ -64,7 +58,6 @@ const currentCategory = computed(
     feedTabs.find((item) => item.id === activeTab.value)?.name ||
     "全部商品",
 );
-const byId = (id) => goods.find((item) => item.id === id);
 function selectCategory(id) {
   router.push({
     path: "/",
@@ -93,12 +86,11 @@ watch(
   },
 );
 </script>
-
 <template>
   <div class="market-home">
     <div class="section-eyebrow">
-      <span><i></i> GOOD FINDS, SECOND LIFE</span
-      ><span>闲置里的小惊喜，今天也在这里</span>
+      <span><i></i> THE SECOND LIFE OF GOOD THINGS</span
+      ><span>每一件好物，都值得再次被喜欢。</span>
     </div>
     <section class="discovery" aria-label="发现好物">
       <CategoryNav
@@ -106,109 +98,105 @@ watch(
         :active-type="activeType"
         @select="({ category, type }) => showFeed(category, type)"
       />
-      <div class="recommendations">
-        <div class="recommend-heading">
-          <h1>好物不贵，快乐加倍<span>精选好物 · 值得再爱一次</span></h1>
-          <button @click="showFeed()">
-            发现更多 <MarketIcon name="arrow" :size="15" />
+      <article class="editorial-hero">
+        <img
+          class="hero-photograph"
+          src="/images/editorial-hero.png"
+          alt="自然光中的复古相机、皮质手提包与奶油色台灯"
+          fetchpriority="high"
+        />
+        <div class="hero-wash"></div>
+        <div class="hero-content">
+          <span class="hero-kicker"><span></span> 拾光 · 好物新生计划</span>
+          <h1>让喜欢的好物，<br />续写<span>新的故事。</span></h1>
+          <p>
+            不必全新，也能怦然心动。<br />在这里，遇见有故事的物件，与刚刚好的生活。
+          </p>
+          <button class="hero-button" @click="showFeed()">
+            发现心动好物 <MarketIcon name="arrow" :size="18" />
           </button>
-        </div>
-        <div class="recommend-matrix">
-          <article class="feature-banner">
-            <span class="banner-label">拾光精选 / DAILY PICKS</span>
-            <h2>闲置抄底<br />好物<span>。</span></h2>
-            <p>给好物第二次心动<br />给生活多一点可能</p>
-            <button class="banner-button" @click="showFeed()">
-              去看看 <MarketIcon name="arrow" :size="18" /></button
-            ><span class="banner-vertical">PRE-LOVED. RE-LOVED.</span>
-            <div class="banner-orbit"></div>
-            <div class="banner-art">
-              <ProductArt kind="camera" color="#ff9971" accent="#e6dfd1" />
-            </div>
-            <span class="banner-sticker">好物<br /><b>低至 3 折</b></span>
-            <div class="banner-bottom">
-              <span>每一份闲置，都藏着一份惊喜</span><span>01 — 04</span>
-            </div>
-          </article>
-          <div class="channel-grid">
-            <article
-              v-for="channel in channels"
-              :key="channel.id"
-              class="channel-card"
-              :style="{ background: channel.color }"
-            >
-              <button class="channel-title" @click="showFeed(channel.id)">
-                <span>{{ channel.title }}</span
-                ><MarketIcon name="arrow" :size="15" />
-              </button>
-              <p>{{ channel.subtitle }}</p>
-              <div class="channel-content">
-                <button
-                  class="channel-decoration"
-                  :aria-label="`浏览${channel.title}`"
-                  @click="showFeed(channel.id)"
-                >
-                  <ProductArt
-                    :kind="channel.kind"
-                    :color="channel.color"
-                    :accent="channel.accent"
-                  /></button
-                ><RouterLink
-                  v-for="id in channel.products"
-                  :key="id"
-                  class="mini-product"
-                  :to="`/goods/${id}`"
-                  :aria-label="byId(id).title"
-                  ><div class="mini-image">
-                    <ProductArt
-                      :kind="byId(id).kind"
-                      :color="byId(id).color"
-                      :accent="byId(id).accent"
-                    />
-                  </div>
-                  <span
-                    ><small>¥</small>{{ byId(id).price.toLocaleString() }}</span
-                  ></RouterLink
-                >
-              </div>
-            </article>
+          <div class="hero-caption">
+            <span>PRE-LOVED, RE-LOVED.</span><span>精选闲置 / 循环生活</span>
           </div>
         </div>
-      </div>
+        <RouterLink class="hero-product-label" to="/goods/1"
+          ><span class="label-dot"></span
+          ><span>本期灵感<small>留住生活里的每一帧</small></span
+          ><MarketIcon name="arrow" :size="16"
+        /></RouterLink>
+      </article>
     </section>
     <div class="trust-strip">
-      <span><MarketIcon name="shield" :size="17" /><b>好物值得信赖</b></span
-      ><span>个人闲置，真实分享</span><i></i><span>循环利用，让好物再发光</span
-      ><i></i><span>理性消费，轻盈生活</span
-      ><span class="trust-note"
-        >每一件闲置，都有它的故事 <MarketIcon name="heart" :size="14"
-      /></span>
+      <span><MarketIcon name="shield" :size="17" />个人闲置，真实分享</span
+      ><span><MarketIcon name="heart" :size="17" />让喜欢，不止一次</span
+      ><span><MarketIcon name="spark" :size="17" />理性消费，轻盈生活</span
+      ><span class="trust-note">GOOD FINDS. BETTER LIVING.</span>
     </div>
-    <section ref="feedRef" class="feed-section" aria-label="推荐商品">
-      <div class="feed-heading">
-        <h2>为你发现<span>总有一件，刚好是你想要的</span></h2>
-        <span class="feed-counter"
-          >{{ filtered.length }} 件心动好物 <span class="red-dot"></span
-        ></span>
-      </div>
-      <div class="feed-tabs" role="group" aria-label="筛选商品分类">
-        <button
-          v-for="tab in feedTabs"
-          :key="tab.id"
-          :class="{ selected: activeTab === tab.id }"
-          :aria-pressed="activeTab === tab.id"
-          @click="selectCategory(tab.id)"
-        >
-          <MarketIcon v-if="tab.id === 'all'" name="spark" :size="15" />{{
-            tab.name
-          }}
+    <section class="collections" aria-label="精选频道">
+      <div class="section-heading">
+        <div>
+          <span class="overline">THE CURATED EDIT</span>
+          <h2>从你的热爱出发<span>四种生活灵感，慢慢挑。</span></h2>
+        </div>
+        <button class="text-link" @click="showFeed()">
+          逛逛全部 <MarketIcon name="arrow" :size="17" />
         </button>
+      </div>
+      <div class="collection-grid">
+        <button
+          v-for="(channel, index) in channels"
+          :key="channel.id"
+          class="collection-card"
+          @click="showFeed(channel.id)"
+        >
+          <div class="collection-image">
+            <ProductVisual
+              :kind="channel.kind"
+              :color="channel.color"
+              :accent="channel.accent"
+            /><span class="collection-number">0{{ index + 1 }} / EDIT</span
+            ><span class="collection-arrow"
+              ><MarketIcon name="arrow" :size="18"
+            /></span>
+          </div>
+          <div class="collection-copy">
+            <h3>{{ channel.title }}</h3>
+            <p>{{ channel.subtitle }}</p>
+          </div>
+        </button>
+      </div>
+    </section>
+    <section ref="feedRef" class="feed-section" aria-label="推荐商品">
+      <div class="section-heading">
+        <div>
+          <span class="overline">DISCOVER YOUR NEXT FAVOURITE</span>
+          <h2>刚刚好，是你想要的<span>好物不必昂贵，喜欢自有价值。</span></h2>
+        </div>
+        <span class="feed-counter"
+          ><span></span>{{ filtered.length }} 件好物，等待相遇</span
+        >
+      </div>
+      <div class="feed-toolbar">
+        <div class="feed-tabs" role="group" aria-label="筛选商品分类">
+          <button
+            v-for="tab in feedTabs"
+            :key="tab.id"
+            :class="{ selected: activeTab === tab.id }"
+            :aria-pressed="activeTab === tab.id"
+            @click="selectCategory(tab.id)"
+          >
+            {{ tab.name }}<span v-if="activeTab === tab.id"></span>
+          </button>
+        </div>
+        <span class="feed-sort"
+          >为你精选 <MarketIcon name="spark" :size="15"
+        /></span>
       </div>
       <div v-if="isFiltered" class="filter-summary">
         <span
           >{{
             keyword
-              ? `“${keyword}” 的搜索结果`
+              ? "“" + keyword + "” 的搜索结果"
               : [currentCategory, typeName].filter(Boolean).join(" / ")
           }}
           · {{ filtered.length }} 件</span
@@ -230,439 +218,518 @@ watch(
       <el-empty v-else description="暂时没找到这件好物，换个关键词试试吧"
         ><el-button @click="router.push('/')">看看全部好物</el-button></el-empty
       >
-      <div class="feed-end"><span></span>好物还会再相遇<span></span></div>
+      <div class="feed-end"><span></span>慢慢逛，好物总会相遇<span></span></div>
+    </section>
+    <section class="closing-note">
+      <span class="closing-symbol">↗</span>
+      <div>
+        <span class="overline">MAKE ROOM FOR WHAT'S NEXT</span>
+        <h2>你的闲置，是别人的心动。</h2>
+        <p>让好物继续被使用，让生活留一点空间。</p>
+      </div>
+      <RouterLink class="closing-button" to="/publish"
+        >发布我的闲置 <MarketIcon name="plus" :size="18"
+      /></RouterLink>
     </section>
     <footer class="market-footer">
-      <RouterLink to="/">拾光闲置<span>.</span></RouterLink
-      ><span>让每一件好物，都有新的故事。</span
-      ><small>MOCK 展示 · 商品与价格均为示例</small>
+      <div>
+        <RouterLink to="/">拾光闲置<span>.</span></RouterLink>
+        <p>好物有下一站，生活有新可能。</p>
+      </div>
+      <span>LESS WASTE. MORE STORIES.</span
+      ><small>Mock 展示 · 商品与价格均为示例</small>
     </footer>
     <FloatingDock />
   </div>
 </template>
-
 <style scoped>
 .section-eyebrow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  color: #a1a0a9;
-  font-size: 10px;
+  margin-bottom: 22px;
+  color: #92938d;
+  font-size: 11px;
 }
 .section-eyebrow > span:first-child {
-  letter-spacing: 1.8px;
-  color: #7e7d87;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
+  letter-spacing: 1.7px;
+  font-size: 9px;
+  font-weight: 550;
 }
 .section-eyebrow i {
   width: 5px;
   height: 5px;
-  background: #ee4841;
   border-radius: 50%;
+  background: var(--accent);
 }
 .discovery {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
 }
-.recommend-heading {
-  height: 42px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.recommend-heading h1 {
-  font-size: 20px;
-  letter-spacing: -0.4px;
-  margin: 0;
-}
-.recommend-heading h1 span {
-  font-size: 10px;
-  color: #aaa9b1;
-  font-weight: 400;
-  margin-left: 14px;
-  letter-spacing: 0;
-}
-.recommend-heading > button {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  color: #8e8d96;
-}
-.recommend-matrix {
-  display: grid;
-  grid-template-columns: minmax(210px, 0.82fr) minmax(0, 1.7fr);
-  gap: 15px;
-  height: calc(100% - 42px);
-}
-.feature-banner {
+.editorial-hero {
   position: relative;
+  overflow: hidden;
+  min-height: 462px;
   border-radius: 16px;
-  background: linear-gradient(145deg, #fc683f, #f14537 60%, #e6372e);
-  color: white;
-  padding: 25px 22px;
-  overflow: hidden;
-  min-height: 385px;
+  background: #e9e5db;
 }
-.banner-label {
-  font-size: 9px;
-  letter-spacing: 1.4px;
-  color: #ffe1d4;
-}
-.feature-banner h2 {
-  font-size: 36px;
-  line-height: 1.18;
-  letter-spacing: -1px;
-  margin: 19px 0 12px;
-  position: relative;
-  z-index: 2;
-}
-.feature-banner h2 span {
-  color: #ffdf9e;
-}
-.feature-banner p {
-  font-size: 11px;
-  color: #ffdbd2;
-  line-height: 1.9;
-  position: relative;
-  z-index: 2;
-}
-.banner-button {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  font-size: 12px;
-  font-weight: 600;
-  background: #fff4de;
-  color: #d8442f;
-  border-radius: 30px;
-  padding: 10px 17px;
-  position: relative;
-  z-index: 3;
-}
-.banner-button:hover {
-  background: white;
-}
-.banner-vertical {
+.hero-photograph {
   position: absolute;
-  right: 14px;
-  top: 35px;
-  writing-mode: vertical-rl;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #ffc2ad;
-}
-.banner-art {
-  position: absolute;
-  width: 205px;
-  height: 205px;
-  right: -6px;
-  bottom: 23px;
-  transform: rotate(-10deg);
-}
-.banner-art :deep(svg) {
-  border-radius: 50%;
-}
-.banner-orbit {
-  position: absolute;
-  width: 300px;
-  height: 190px;
-  border: 1px solid #ffc9b83b;
-  border-radius: 50%;
-  right: -47px;
-  bottom: 29px;
-  transform: rotate(-29deg);
-}
-.banner-sticker {
-  position: absolute;
-  bottom: 50px;
-  left: 18px;
-  z-index: 2;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: #ffe7a2;
-  color: #ad462d;
-  display: grid;
-  align-content: center;
-  text-align: center;
-  font-size: 10px;
-  transform: rotate(-14deg);
-  border: 3px solid #ffbd79;
-}
-.banner-sticker b {
-  font-size: 11px;
-  margin-top: 3px;
-}
-.banner-bottom {
-  display: flex;
-  justify-content: space-between;
-  position: absolute;
-  bottom: 13px;
-  left: 20px;
-  right: 20px;
-  font-size: 8px;
-  color: #ffd1bf;
-}
-.channel-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-.channel-card {
-  padding: 17px 14px 11px;
-  border-radius: 14px;
-  overflow: hidden;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-.channel-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px #2422380b;
-}
-.channel-title {
-  display: flex;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 62% center;
+}
+.hero-wash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #f0ebe2f5 0%,
+    #f0ebe2e8 26%,
+    #f0ebe269 53%,
+    transparent 75%
+  );
+}
+.hero-content {
+  position: relative;
+  padding: 47px 42px;
+  z-index: 1;
+}
+.hero-kicker {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0;
-  font-size: 16px;
-  font-weight: 650;
+  gap: 8px;
+  color: #686a5c;
+  font-size: 10px;
+  letter-spacing: 1.3px;
 }
-.channel-title svg {
-  color: #8b8188;
+.hero-kicker > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #859177;
 }
-.channel-card > p {
-  font-size: 9px;
-  color: #928991;
-  margin: 6px 0 12px;
+.hero-content h1 {
+  font-size: clamp(32px, 3.35vw, 45px);
+  font-weight: 550;
+  letter-spacing: -2px;
+  line-height: 1.5;
+  margin: 28px 0 18px;
+  color: #30382f;
 }
-.channel-content {
-  display: grid;
-  grid-template-columns: 0.85fr 1fr 1fr;
-  align-items: end;
-  gap: 7px;
+.hero-content h1 > span {
+  color: var(--accent);
 }
-.channel-decoration {
-  padding: 0;
-  height: 89px;
-  margin-left: -5px;
-}
-.channel-decoration :deep(svg) {
-  mix-blend-mode: multiply;
-}
-.mini-product {
-  background: #ffffffc9;
-  border: 1px solid #ffffffbd;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 4px 4px 5px;
-  text-align: center;
-  transition: transform 0.2s;
-}
-.mini-product:hover {
-  transform: translateY(-3px);
-}
-.mini-image {
-  aspect-ratio: 1;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.mini-product > span {
-  display: block;
+.hero-content > p {
+  color: #77796c;
   font-size: 12px;
-  color: #ef4741;
-  font-weight: 700;
-  margin-top: 5px;
+  line-height: 2;
+  margin: 0 0 25px;
 }
-.mini-product small {
+.hero-button {
+  display: flex;
+  align-items: center;
+  gap: 23px;
+  background: #333e33;
+  color: #fff;
+  border-radius: 8px;
+  padding: 14px 19px;
+  font-size: 12px;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.hero-button:hover {
+  background: #475946;
+  transform: translateY(-2px);
+}
+.hero-caption {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin-top: 35px;
   font-size: 9px;
-  margin-right: 1px;
+  color: #8b8c7b;
+  letter-spacing: 1px;
+}
+.hero-caption > span:last-child {
+  font-size: 9px;
+  letter-spacing: 0;
+  padding-left: 17px;
+  border-left: 1px solid #bfbfac;
+}
+.hero-product-label {
+  position: absolute;
+  bottom: 30px;
+  right: 25px;
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 13px 15px;
+  border: 1px solid #ffffff70;
+  background: #ffffffe6;
+  backdrop-filter: blur(12px);
+  border-radius: 9px;
+  font-size: 11px;
+  color: #555b4d;
+}
+.label-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #899777;
+}
+.hero-product-label small {
+  display: block;
+  font-size: 9px;
+  color: #92938b;
+  margin-top: 4px;
+}
+.hero-product-label > svg {
+  margin-left: 13px;
 }
 .trust-strip {
   display: flex;
-  gap: 22px;
+  gap: 34px;
   align-items: center;
-  padding: 18px 8px;
-  font-size: 10px;
-  color: #9998a0;
-  border-bottom: 1px solid #e8e8ec;
-  margin-bottom: 29px;
+  padding: 23px 3px;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--line);
+  color: #8b8c83;
+  font-size: 11px;
 }
 .trust-strip > span {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.trust-strip b {
-  font-size: 11px;
-  color: #74727d;
-  font-weight: 500;
-}
-.trust-strip svg {
-  color: #c58272;
-}
-.trust-strip i {
-  width: 1px;
-  height: 9px;
-  background: #dddce2;
-}
-.trust-note {
-  margin-left: auto;
-}
-.feed-section {
-  scroll-margin-top: 24px;
-}
-.feed-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 18px;
-}
-.feed-heading h2 {
-  font-size: 22px;
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-.feed-heading h2 > span {
-  font-size: 11px;
-  font-weight: 400;
-  color: #a2a1aa;
-  margin-left: 15px;
-  letter-spacing: 0;
-}
-.feed-counter {
-  color: #a7a6af;
-  font-size: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.red-dot {
+.trust-strip svg {
+  color: #8d997e;
+}
+.trust-note {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #a0a098;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 23px;
+}
+.overline {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  color: #92958a;
+  display: block;
+  font-weight: 550;
+}
+.section-heading h2 {
+  font-size: 25px;
+  font-weight: 550;
+  letter-spacing: -0.7px;
+  margin: 10px 0 0;
+}
+.section-heading h2 > span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #999b92;
+  margin-left: 18px;
+  letter-spacing: 0;
+}
+.text-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 11px;
+  color: #686e61;
+  padding: 4px 0;
+}
+.text-link:hover {
+  color: var(--accent);
+}
+.collections {
+  margin-bottom: 49px;
+}
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 21px;
+}
+.collection-card {
+  padding: 0;
+  text-align: left;
+  min-width: 0;
+}
+.collection-image {
+  position: relative;
+  height: 172px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #eeeae2;
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+.collection-image :deep(img),
+.collection-image :deep(svg) {
+  transition: transform 0.5s;
+}
+.collection-card:hover .collection-image {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 24px #31382b12;
+}
+.collection-card:hover .collection-image :deep(img),
+.collection-card:hover .collection-image :deep(svg) {
+  transform: scale(1.06);
+}
+.collection-number {
+  position: absolute;
+  left: 14px;
+  top: 13px;
+  background: #ffffffe5;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #7d8172;
+}
+.collection-arrow {
+  position: absolute;
+  right: 13px;
+  bottom: 13px;
+  background: white;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #777e6d;
+}
+.collection-copy {
+  padding: 15px 2px 0;
+}
+.collection-copy h3 {
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  font-weight: 550;
+  margin: 0;
+}
+.collection-copy p {
+  margin: 7px 0 0;
+  font-size: 11px;
+  color: #989a90;
+}
+.feed-section {
+  scroll-margin-top: 25px;
+}
+.feed-counter {
+  font-size: 10px;
+  color: #96988d;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: 3px;
+}
+.feed-counter > span {
+  background: #9daa8b;
   width: 5px;
   height: 5px;
-  background: #ee4741;
   border-radius: 50%;
+}
+.feed-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 25px;
+  gap: 20px;
 }
 .feed-tabs {
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 1px 1px 20px;
+  gap: 28px;
+  overflow: auto;
   scrollbar-width: none;
 }
 .feed-tabs > button {
-  border-radius: 22px;
-  padding: 10px 21px;
+  position: relative;
   white-space: nowrap;
-  background: white;
   font-size: 12px;
-  border: 1px solid #eae9ee;
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  transition: background 0.2s;
+  color: #92958b;
+  padding: 0 0 16px;
+  transition: color 0.2s;
 }
 .feed-tabs > button:hover {
-  background: #fff0ee;
+  color: var(--accent);
 }
 .feed-tabs > button.selected {
-  background: #ffdc62;
-  color: #493b18;
-  border-color: #ffdc62;
-  font-weight: 650;
+  color: var(--accent);
+  font-weight: 600;
+}
+.feed-tabs > button > span {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  left: 0;
+  right: 0;
+}
+.feed-sort {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 10px;
+  color: #999b92;
+  padding-bottom: 16px;
+}
+.filter-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #888e7e;
+  margin-bottom: 22px;
+}
+.filter-summary button {
+  color: var(--accent);
 }
 .goods-feed {
   display: grid;
   grid-template-columns: repeat(var(--feed-columns), minmax(0, 1fr));
+  gap: 23px;
   align-items: start;
-  column-gap: 18px;
 }
 .goods-column {
   min-width: 0;
-}
-.filter-summary {
-  margin: 0 0 18px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #7a7885;
-}
-.filter-summary button {
-  color: #ef4741;
 }
 .feed-end {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  color: #b0afb7;
-  font-size: 11px;
-  padding: 30px 0 38px;
+  gap: 18px;
+  padding: 32px 0 48px;
+  color: #a5a69e;
+  font-size: 10px;
 }
-.feed-end span {
+.feed-end > span {
+  width: 50px;
   height: 1px;
-  width: 55px;
-  background: #dedee4;
+  background: var(--line);
 }
-.market-footer {
+.closing-note {
   display: flex;
   align-items: center;
-  gap: 16px;
-  border-top: 1px solid #e5e5ea;
-  padding: 24px 0 0;
+  gap: 28px;
+  padding: 34px 40px;
+  border-radius: 14px;
+  background: #e9ece3;
+  margin-bottom: 43px;
+}
+.closing-symbol {
+  font-size: 58px;
+  line-height: 1;
+  font-weight: 300;
+  color: #899379;
+}
+.closing-note h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 11px 0 9px;
+  color: #44503b;
+}
+.closing-note p {
+  margin: 0;
   font-size: 11px;
-  color: #a4a3ac;
+  color: #949b89;
 }
-.market-footer > a {
-  font-size: 17px;
-  font-weight: 700;
-  color: #65636e;
+.closing-button {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 12px;
+  background: #ffffffb0;
+  border: 1px solid #b5bba24d;
+  border-radius: 7px;
+  padding: 13px 18px;
+  color: #606e52;
+  white-space: nowrap;
 }
-.market-footer > a span {
-  color: #ef4741;
+.closing-button:hover {
+  background: #fff;
+  color: #34422d;
+}
+.market-footer {
+  padding: 0 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.market-footer > div > a {
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -1px;
+}
+.market-footer > div > a span {
+  color: var(--accent);
+}
+.market-footer p {
+  font-size: 10px;
+  color: #93968a;
+  margin: 8px 0 0;
+}
+.market-footer > span {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #adaeaa;
 }
 .market-footer small {
-  margin-left: auto;
   font-size: 9px;
+  color: #adaeaa;
 }
 @media (max-width: 1100px) {
   .discovery {
-    grid-template-columns: 195px minmax(0, 1fr);
-    gap: 15px;
+    grid-template-columns: 185px minmax(0, 1fr);
+    gap: 18px;
   }
-  .recommend-matrix {
-    grid-template-columns: 0.8fr 1.6fr;
-    gap: 10px;
+  .hero-content {
+    padding: 42px 29px;
   }
-  .feature-banner {
-    padding: 24px 17px;
+  .hero-content h1 {
+    font-size: 35px;
   }
-  .feature-banner h2 {
-    font-size: 32px;
+  .hero-product-label {
+    bottom: 23px;
+    right: 18px;
   }
-  .channel-grid {
-    gap: 10px;
+  .hero-caption {
+    gap: 12px;
   }
-  .channel-card {
-    padding: 16px 10px 12px;
+  .collection-grid {
+    gap: 17px;
   }
-  .channel-content {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .collection-image {
+    height: 155px;
   }
-  .channel-decoration {
+  .section-heading h2 > span {
     display: none;
   }
-  .recommend-heading h1 span {
-    display: none;
+  .feed-tabs {
+    gap: 22px;
   }
   .trust-strip {
-    gap: 13px;
+    gap: 26px;
   }
   .trust-note {
     display: none !important;
@@ -672,95 +739,172 @@ watch(
   .discovery {
     grid-template-columns: 1fr;
   }
-  .recommend-matrix {
-    height: auto;
-    grid-template-columns: 0.8fr 1.6fr;
+  .editorial-hero {
+    min-height: 395px;
   }
-  .recommend-heading {
-    height: 45px;
+  .hero-content {
+    padding: 35px;
   }
-  .feature-banner {
-    min-height: 365px;
+  .hero-content h1 {
+    font-size: 37px;
+    margin-top: 24px;
+  }
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px 18px;
+  }
+  .collection-image {
+    height: 195px;
+  }
+  .section-heading h2 {
+    font-size: 23px;
   }
   .trust-strip {
-    justify-content: center;
-  }
-  .trust-strip > span:nth-last-child(2),
-  .trust-strip > i:nth-last-child(3) {
-    display: none;
-  }
-  .section-eyebrow > span:last-child {
-    display: none;
-  }
-}
-@media (max-width: 600px) {
-  .recommend-matrix {
-    grid-template-columns: 1fr;
-  }
-  .feature-banner {
-    min-height: 280px;
-  }
-  .feature-banner h2 {
-    font-size: 34px;
-    margin-top: 15px;
-  }
-  .feature-banner p {
-    margin-bottom: 15px;
-  }
-  .banner-art {
-    width: 240px;
-    height: 240px;
-    right: 0;
-    bottom: 13px;
-  }
-  .banner-sticker {
-    left: auto;
-    right: 10px;
-    bottom: 40px;
-  }
-  .banner-orbit {
-    right: -8px;
-  }
-  .channel-card {
-    min-height: 166px;
-  }
-  .channel-title {
-    font-size: 14px;
-  }
-  .mini-image {
-    max-height: 92px;
-  }
-  .goods-feed {
-    column-gap: 12px;
-  }
-  .feed-heading h2 > span {
-    display: block;
-    margin: 8px 0 0;
+    gap: 22px;
+    justify-content: space-between;
+    font-size: 10px;
+    margin-bottom: 30px;
   }
   .feed-counter {
     font-size: 9px;
   }
-  .feed-tabs > button {
-    padding: 9px 16px;
+  .goods-feed {
+    gap: 18px;
   }
-  .trust-strip {
-    font-size: 9px;
-    gap: 12px;
+  .closing-note {
+    padding: 27px;
+    gap: 17px;
   }
-  .trust-strip > span:nth-child(4),
-  .trust-strip > i {
+  .closing-note h2 {
+    font-size: 19px;
+  }
+  .market-footer > span {
     display: none;
   }
+}
+@media (max-width: 520px) {
+  .section-eyebrow > span:last-child {
+    display: none;
+  }
+  .section-eyebrow {
+    margin-bottom: 17px;
+  }
+  .editorial-hero {
+    min-height: 430px;
+  }
+  .hero-photograph {
+    object-position: 65% center;
+  }
+  .hero-wash {
+    background: linear-gradient(90deg, #f0ebe2ef, #f0ebe2b0 50%, #f0ebe245);
+  }
+  .hero-content {
+    padding: 30px 25px;
+  }
+  .hero-content h1 {
+    font-size: 31px;
+    letter-spacing: -1px;
+    margin-top: 27px;
+  }
+  .hero-content > p {
+    font-size: 11px;
+    max-width: 230px;
+  }
+  .hero-caption {
+    margin-top: 24px;
+    font-size: 8px;
+    gap: 10px;
+  }
+  .hero-caption > span:last-child {
+    padding-left: 10px;
+    font-size: 8px;
+  }
+  .hero-product-label {
+    bottom: 20px;
+    right: 18px;
+  }
+  .trust-strip {
+    gap: 12px;
+    padding: 21px 0;
+  }
+  .trust-strip > span {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .trust-strip svg {
+    width: 14px;
+  }
+  .trust-strip > span:nth-child(3) {
+    display: none;
+  }
+  .collection-image {
+    height: 160px;
+  }
+  .collection-copy h3 {
+    font-size: 14px;
+  }
+  .collection-copy p {
+    font-size: 10px;
+  }
+  .collections {
+    margin-bottom: 38px;
+  }
+  .section-heading h2 {
+    font-size: 21px;
+    margin-top: 10px;
+  }
+  .overline {
+    font-size: 8px;
+    letter-spacing: 1.3px;
+  }
+  .text-link {
+    gap: 6px;
+    font-size: 10px;
+  }
+  .feed-counter {
+    display: none;
+  }
+  .feed-sort {
+    display: none;
+  }
+  .feed-tabs {
+    gap: 24px;
+  }
+  .feed-tabs > button {
+    font-size: 11px;
+  }
+  .goods-feed {
+    gap: 14px;
+  }
+  .closing-note {
+    position: relative;
+    align-items: flex-start;
+    padding: 25px 22px 80px;
+    gap: 12px;
+  }
+  .closing-symbol {
+    font-size: 38px;
+  }
+  .closing-note h2 {
+    font-size: 17px;
+  }
+  .closing-note .overline {
+    font-size: 7px;
+  }
+  .closing-button {
+    position: absolute;
+    left: 72px;
+    bottom: 22px;
+    padding: 10px 15px;
+    font-size: 11px;
+  }
   .market-footer {
-    gap: 8px;
-    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
   }
-  .market-footer small {
-    width: 100%;
-    margin-left: 0;
-  }
-  .recommend-heading h1 {
-    font-size: 18px;
+  .market-footer > div > a {
+    font-size: 20px;
   }
 }
 </style>

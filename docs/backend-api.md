@@ -1,6 +1,6 @@
 # 拾光闲置 · 后端 REST API 对接文档
 
-版本：v1 草案 · 更新日期：2026-10-06 · 后端计划：Java Spring Boot。
+版本：v1 草案 · 更新日期：2026-10-11 · 后端计划：Java Spring Boot。
 
 本文是根据当前前端制定的接口契约，供后端实现和前后端联调使用，不代表接口已经部署。登录、注册的路径和响应字段与现有前端一致；其他接口为本次提出的待实现设计。当前首页和商品详情仍使用本地 Mock，发布、订单和消息尚未接入后端。
 
@@ -78,7 +78,7 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
 
 ## 2. 接口总览
 
-下面路径均包含 `/api`。
+完整地址是在下表路径前加 `/api` 前缀，例如 `/api/auth/login`。
 
 | 模块 | 方法 | 路径 | 鉴权 | 用途 / 当前前端状态 |
 | --- | --- | --- | --- | --- |
@@ -197,9 +197,9 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
 {
   "hotSearches": ["iPhone 15", "富士 X100V", "复古", "Switch", "户外徒步", "香水", "吉他"],
   "banner": {
-    "title": "闲置抄底好物",
-    "subtitle": "给好物第二次心动，给生活多一点可能",
-    "buttonText": "去看看",
+    "title": "让喜欢的好物，续写新的故事。",
+    "subtitle": "不必全新，也能怦然心动。在这里，遇见有故事的物件。",
+    "buttonText": "发现心动好物",
     "imageUrl": "/media/banner/daily-picks.webp",
     "targetCategoryId": null
   },
@@ -220,7 +220,7 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
 }
 ```
 
-频道最多 4 个，每个最多 2 件可售商品；空频道不展示，数量不足按实际返回。图片 URL 应为可访问的同源地址或经过配置的可信媒体域名。链接目标由 categoryId 或 goods ID 决定，不允许后端返回任意跳转脚本。
+新版首页使用四个摄影频道卡片，decorationUrl 为频道主图；goods 为可选扩展数据，当前模板不渲染迷你商品。频道最多 4 个，每个最多 2 件可售商品；空频道不展示。图片 URL 应为同源地址或可信媒体域名。开发建议使用 `/api/media/**`，可直接经过现有 Vite `/api` 代理；本篇 `/media/**` 示例使用时需改为 `/api/media/**` 或另配 Vite 代理。链接目标由 categoryId 或 goods ID 决定，不允许任意跳转脚本。
 
 ## 5. 商品
 
@@ -457,7 +457,7 @@ content 必填，1～500 位；pagePath 可选，最长 500 位，仅站内路�
 | 商品 seller 字符串 | seller.nickname；组件需要适配 seller 对象 |
 | 商品 avatar 颜色 | avatarUrl；为空时保留首字头像占位 |
 | 商品 wanted | wantedCount |
-| ProductArt SVG | coverUrl / images；可保留 SVG 作为加载失败占位 |
+| ProductVisual 本地图片 / ProductArt SVG | coverUrl / images；组件需接收后端 URL，可保留本地素材作为失败占位 |
 | 商品个人闲置标记 | sellerType=PERSONAL |
 | 订单 Tab buy / sell | role=buy / role=sell |
 

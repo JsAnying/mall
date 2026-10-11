@@ -1,30 +1,34 @@
 <script setup>
-import ProductArt from "./ProductArt.vue";
+import ProductVisual from "./ProductVisual.vue";
+import MarketIcon from "./MarketIcon.vue";
 defineProps({ goods: { type: Object, required: true } });
 </script>
 <template>
-  <RouterLink class="goods-card" :to="`/goods/${goods.id}`">
-    <div class="goods-image" :style="{ '--image-height': `${goods.height}px` }">
-      <ProductArt
+  <RouterLink class="goods-card" :to="'/goods/' + goods.id">
+    <div class="goods-image">
+      <ProductVisual
         :kind="goods.kind"
         :color="goods.color"
         :accent="goods.accent"
       /><span class="condition">{{ goods.condition }}</span
-      ><span class="image-badge">个人闲置</span>
+      ><span class="image-badge"><MarketIcon name="arrow" :size="17" /></span>
     </div>
     <div class="goods-body">
+      <div class="card-eyebrow">
+        <span>个人闲置</span><span>{{ goods.location }}</span>
+      </div>
       <h3>{{ goods.title }}</h3>
       <div class="price-row">
         <span class="price"
           ><small>¥</small>{{ goods.price.toLocaleString() }}</span
-        ><span class="wanted">{{ goods.wanted }}人想要</span>
+        ><span class="wanted">{{ goods.wanted }} 人想要</span>
       </div>
       <div class="seller">
         <span class="seller-avatar" :style="{ background: goods.avatar }">{{
           goods.seller.slice(0, 1)
         }}</span
         ><span class="seller-name">{{ goods.seller }}</span
-        ><span class="seller-location">{{ goods.location }}</span>
+        ><span class="seller-dot"></span>
       </div>
     </div>
   </RouterLink>
@@ -32,63 +36,83 @@ defineProps({ goods: { type: Object, required: true } });
 <style scoped>
 .goods-card {
   display: block;
-  background: white;
+  background: #fffefa;
   overflow: hidden;
-  border-radius: 14px;
-  margin-bottom: 18px;
-  break-inside: avoid;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #eeeee5;
+  color: #383e31;
   transition:
-    transform 0.22s,
-    box-shadow 0.22s;
-  border: 1px solid #eeeef1;
-  color: #29282f;
+    transform 0.25s,
+    box-shadow 0.25s;
 }
 .goods-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 28px #22223512;
+  box-shadow: 0 14px 35px #3743290e;
+  color: #383e31;
 }
 .goods-image {
   position: relative;
-  height: var(--image-height);
+  aspect-ratio: 1.07;
   overflow: hidden;
+  background: #eeeae2;
 }
+.goods-image :deep(img),
 .goods-image :deep(svg) {
-  transition: transform 0.35s;
+  transition: transform 0.5s;
 }
+.goods-card:hover .goods-image :deep(img),
 .goods-card:hover .goods-image :deep(svg) {
   transform: scale(1.045);
 }
 .condition {
   position: absolute;
-  top: 11px;
-  left: 11px;
-  font-size: 10px;
-  font-weight: 600;
-  background: #ffffffdd;
-  border: 1px solid #ffffffa0;
-  padding: 4px 7px;
+  top: 13px;
+  left: 13px;
   border-radius: 5px;
-  color: #505058;
+  background: #fffefaeb;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: #777e6b;
+  padding: 5px 8px;
 }
 .image-badge {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  background: #ffffffb0;
-  border-radius: 5px;
-  padding: 3px 6px;
-  font-size: 9px;
-  color: #68656a;
+  bottom: 13px;
+  right: 13px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fffefade;
+  color: #869073;
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+.goods-card:hover .image-badge {
+  opacity: 1;
+  transform: none;
 }
 .goods-body {
-  padding: 13px 14px 14px;
+  padding: 15px 17px 16px;
+}
+.card-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #a4a894;
+  margin-bottom: 8px;
 }
 h3 {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.7;
-  margin: 0 0 9px;
-  height: 44px;
+  margin: 0 0 13px;
+  font-size: 12px;
+  line-height: 1.8;
+  font-weight: 450;
+  height: 43px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -98,65 +122,88 @@ h3 {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 4px;
+  gap: 5px;
 }
 .price {
-  color: #ed443e;
-  font-size: 23px;
-  font-weight: 750;
-  letter-spacing: -0.7px;
+  font-size: 22px;
+  color: var(--accent);
+  font-weight: 550;
+  letter-spacing: -0.4px;
 }
 .price small {
-  font-size: 13px;
+  font-size: 11px;
   margin-right: 3px;
 }
 .wanted {
-  color: #aaa9b0;
-  font-size: 10px;
+  font-size: 9px;
+  color: #b0b3a5;
   white-space: nowrap;
 }
 .seller {
-  margin-top: 14px;
-  padding-top: 11px;
-  border-top: 1px solid #f3f3f5;
   display: flex;
-  gap: 6px;
+  gap: 7px;
   align-items: center;
+  border-top: 1px solid #f0f0e8;
+  padding-top: 12px;
+  margin-top: 13px;
   font-size: 10px;
-  color: #8a8992;
+  color: #9a9f8e;
 }
 .seller-avatar {
-  width: 23px;
-  height: 23px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  color: #746760;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  flex-shrink: 0;
+  width: 23px;
+  height: 23px;
+  font-size: 9px;
+  color: #827d6f;
+  border-radius: 50%;
 }
 .seller-name {
-  overflow: hidden;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
-.seller-location {
+.seller-dot {
   margin-left: auto;
-  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #b2baa1;
 }
 @media (max-width: 520px) {
+  .goods-card {
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
   .goods-image {
-    height: 180px;
+    aspect-ratio: 1;
   }
   .goods-body {
-    padding: 10px;
+    padding: 12px;
+  }
+  .condition {
+    top: 9px;
+    left: 9px;
+    font-size: 8px;
+    padding: 4px 6px;
+  }
+  h3 {
+    font-size: 11px;
+    height: 40px;
+    margin-bottom: 10px;
   }
   .price {
     font-size: 20px;
   }
-  .wanted,
-  .seller-location {
-    display: none;
+  .wanted {
+    font-size: 8px;
+  }
+  .seller {
+    font-size: 9px;
+  }
+  .card-eyebrow {
+    font-size: 8px;
   }
 }
 </style>

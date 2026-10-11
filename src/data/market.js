@@ -1,4 +1,4 @@
-// 离线 Mock 数据。图片使用本地 SVG 组件绘制，不依赖图片服务器。
+// 离线 Mock 数据。图片使用本地摄影风格素材与 SVG 插画，不依赖图片服务器。
 export const categories = [
   {
     id: "digital",

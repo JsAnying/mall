@@ -30,7 +30,7 @@ function select(type) {
   >
     <div class="category-heading">
       <span class="category-grid">▦</span>
-      <h2>逛逛分类</h2>
+      <h2>好物分类</h2>
       <span>发现所爱</span>
     </div>
     <button
@@ -53,7 +53,7 @@ function select(type) {
       ><MarketIcon class="category-chevron" name="chevron" :size="12" />
     </button>
     <div class="category-foot">
-      <span class="live-dot"></span>每天都有新鲜好物
+      <span class="live-dot"></span>发现所爱，慢慢挑选
     </div>
     <Transition name="flyout">
       <section
@@ -108,8 +108,8 @@ function select(type) {
 .category-panel {
   position: relative;
   z-index: 10;
-  background: white;
-  border: 1px solid #eeeef1;
+  background: #fffefa;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 17px 10px 12px;
 }
@@ -122,7 +122,7 @@ function select(type) {
   margin-bottom: 5px;
 }
 .category-grid {
-  color: #ed4741;
+  color: var(--accent);
   font-size: 23px;
 }
 .category-heading h2 {
@@ -141,20 +141,20 @@ function select(type) {
   align-items: center;
   gap: 11px;
   border-radius: 9px;
-  padding: 10px 9px;
+  padding: 9px 9px;
   transition: background 0.2s;
 }
 .category-item:hover,
 .category-item.active {
-  background: #fff2f0;
-  color: #ed4741;
+  background: #f6eee5;
+  color: var(--accent);
 }
 .category-icon {
   color: #696874;
   display: flex;
 }
 .category-item.active .category-icon {
-  color: #ed4741;
+  color: var(--accent);
 }
 .category-name {
   font-size: 12px;
@@ -193,8 +193,8 @@ function select(type) {
   left: calc(100% + 12px);
   width: min(580px, calc(100vw - 310px));
   padding: 26px;
-  background: white;
-  border: 1px solid #f0dedb;
+  background: #fffefa;
+  border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 18px 48px #35252c24;
   z-index: 11;
@@ -227,14 +227,14 @@ function select(type) {
   font-size: 21px;
 }
 .flyout-heading h3 svg {
-  color: #ef4741;
+  color: var(--accent);
 }
 .view-all {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: #ef4741;
+  color: var(--accent);
 }
 .type-group {
   display: grid;
@@ -256,7 +256,7 @@ function select(type) {
 .type-links button {
   font-size: 12px;
   color: #827987;
-  background: #f7f6f8;
+  background: #f3f4ed;
   border-radius: 7px;
   padding: 7px 10px;
   transition:
@@ -265,8 +265,8 @@ function select(type) {
 }
 .type-links button:hover,
 .type-links button.selected {
-  color: #ef4741;
-  background: #fff0ed;
+  color: var(--accent);
+  background: #f6eee5;
 }
 .flyout-foot {
   display: flex;

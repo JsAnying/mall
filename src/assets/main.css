@@ -1,16 +1,18 @@
 :root {
   font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: #29282f;
-  background: #f5f5f7;
+  color: #363c31;
+  background: #f6f6f0;
   font-synthesis: none;
-  --el-color-primary: #ef4741;
-  --el-color-primary-light-3: #f57e79;
-  --el-color-primary-light-5: #f7a3a0;
-  --el-color-primary-light-7: #fac8c6;
-  --el-color-primary-light-8: #fcdbd9;
-  --el-color-primary-light-9: #fef0ef;
-  --el-color-primary-dark-2: #cd3833;
-  --el-border-radius-base: 12px;
+  --accent: #cc5847;
+  --line: #e6e8dd;
+  --el-color-primary: #cc5847;
+  --el-color-primary-light-3: #dc897b;
+  --el-color-primary-light-5: #e6aba2;
+  --el-color-primary-light-7: #efd0ca;
+  --el-color-primary-light-8: #f4dfdb;
+  --el-color-primary-light-9: #f9efed;
+  --el-color-primary-dark-2: #ac4435;
+  --el-border-radius-base: 9px;
 }
 * {
   box-sizing: border-box;
@@ -37,7 +39,7 @@ textarea {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid #f49d98;
+  outline: 2px solid #cc584799;
   outline-offset: 4px;
 }
 a {
@@ -45,12 +47,12 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #ef4741;
+  color: var(--accent);
 }
 .page {
   max-width: 1200px;
-  margin: 24px auto 0;
-  padding-bottom: 36px;
+  margin: 30px auto 0;
+  padding-bottom: 20px;
 }
 h1 {
   font-size: 28px;
@@ -60,38 +62,45 @@ h2 {
   font-size: 20px;
 }
 .muted {
-  color: #8e8e97;
+  color: #929787;
   margin-bottom: 28px;
 }
 .auth-card {
   max-width: 420px;
-  margin: 48px auto;
-  border-radius: 16px;
+  margin: 65px auto;
+  border-radius: 14px;
 }
 .auth-card a {
-  color: #ef4741;
+  color: var(--accent);
 }
 .full-width {
   width: 100%;
 }
 .el-card {
-  border-radius: 16px;
-  border-color: #eeeef1;
+  border-radius: 14px;
+  border-color: #e6e8dd;
+  background: #fffefa;
 }
-@media (max-width: 1300px) {
+.el-dialog {
+  border-radius: 14px !important;
+}
+.el-button {
+  font-weight: 450;
+}
+@media (max-width: 1360px) {
   .page {
-    margin-left: 28px;
-    margin-right: 78px;
+    margin-left: 40px;
+    margin-right: 85px;
   }
 }
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .page {
-    margin-right: 28px;
+    margin: 25px 25px 0;
   }
 }
 @media (max-width: 520px) {
   .page {
-    margin: 18px 18px 0;
+    margin: 21px 20px 0;
   }
   h1 {
     font-size: 24px;
