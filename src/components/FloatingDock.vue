@@ -5,13 +5,16 @@ import MarketIcon from "./MarketIcon.vue";
 const panel = ref("");
 const feedback = ref("");
 const submitted = ref(false);
+const error = ref("");
+const savedId = ref("");
 function openPanel(name) {
   panel.value = name;
   submitted.value = false;
+  error.value = "";
 }
 function submitFeedback() {
   if (!feedback.value.trim()) {
-    ElMessage.warning("请先填写你的建议");
+    error.value = "请先填写建议，最多 500 位。";
     return;
   }
   try {
@@ -19,17 +22,39 @@ function submitFeedback() {
       localStorage.getItem("market_feedback") || "[]",
     );
     const entries = Array.isArray(previous) ? previous : [];
+    savedId.value = crypto.randomUUID();
     localStorage.setItem(
       "market_feedback",
       JSON.stringify([
         ...entries,
-        { content: feedback.value.trim(), createdAt: new Date().toISOString() },
+        {
+          id: savedId.value,
+          content: feedback.value.trim(),
+          createdAt: new Date().toISOString(),
+        },
       ]),
     );
     feedback.value = "";
     submitted.value = true;
   } catch {
-    ElMessage.error("本地保存失败，请检查浏览器存储设置");
+    error.value = "建议未保存，请检查浏览器存储设置后重试。内容已保留。";
+  }
+}
+function undoFeedback() {
+  try {
+    const entries = JSON.parse(localStorage.getItem("market_feedback") || "[]");
+    const last = entries.find((item) => item.id === savedId.value);
+    localStorage.setItem(
+      "market_feedback",
+      JSON.stringify(entries.filter((item) => item.id !== savedId.value)),
+    );
+    feedback.value = last?.content || "";
+    submitted.value = false;
+    savedId.value = "";
+    error.value = "";
+    ElMessage.success("已撤销保存，可以继续修改建议");
+  } catch {
+    error.value = "无法撤销，请检查浏览器存储设置后重试。";
   }
 }
 function backToTop() {
@@ -65,7 +90,7 @@ function backToTop() {
     @close="panel = ''"
   >
     <template v-if="panel === 'messages'"
-      ><el-empty description="暂时没有新消息" :image-size="90" />
+      ><el-empty description="消息服务尚未开放" :image-size="90" />
       <p class="dialog-note">
         当前为离线展示，聊天消息将在后端接入后开放。
       </p></template
@@ -74,9 +99,7 @@ function backToTop() {
       ><div class="mobile-symbol"><MarketIcon name="phone" :size="64" /></div>
       <p>在手机浏览器打开本站地址，即可使用移动端布局。</p>
       <p class="dialog-note">
-        本地开发时，请用
-        <code>npm run dev -- --host</code> 启动，并在同一局域网内访问电脑 IP
-        与端口。暂无独立 App。
+        当前没有独立 App。搜索、分类和商品详情均支持手机浏览。
       </p></template
     >
     <template v-if="panel === 'feedback'"
@@ -84,8 +107,12 @@ function backToTop() {
         v-if="submitted"
         icon="success"
         title="建议已保存在本机"
-        sub-title="感谢你的建议！后端接入后可启用在线提交。"
-      />
+        sub-title="建议仅在此浏览器保存，没有发送给平台。"
+        ><template #extra
+          ><el-button @click="undoFeedback">撤销保存，继续修改</el-button
+          ><el-button @click="panel = ''">关闭</el-button></template
+        ></el-result
+      >
       <form v-else @submit.prevent="submitFeedback">
         <label class="feedback-label" for="feedback-text"
           >你想让拾光变得更好的一点是？</label
@@ -99,9 +126,18 @@ function backToTop() {
           placeholder="页面体验、功能建议，或任何小想法……"
         />
         <p class="dialog-note">此版本仅保存至本机浏览器，不发送至服务器。</p>
-        <el-button type="primary" native-type="submit">保存建议</el-button>
+        <div v-if="error" class="error-panel" role="alert">{{ error }}</div>
+        <el-button
+          type="primary"
+          native-type="submit"
+          :disabled="!feedback.trim()"
+          >保存到本机</el-button
+        ><el-button @click="panel = ''">取消</el-button>
       </form></template
     >
+    <div v-if="submitted && error" class="error-panel" role="alert">
+      {{ error }}
+    </div>
   </el-dialog>
 </template>
 

@@ -8,6 +8,7 @@ import GoodsCard from "@/components/GoodsCard.vue";
 import FloatingDock from "@/components/FloatingDock.vue";
 import CategoryNav from "@/components/CategoryNav.vue";
 import { getTypeName } from "@/data/categoryTypes.js";
+const previousFilters = ref(null);
 const route = useRoute();
 const router = useRouter();
 const feedRef = ref();
@@ -21,13 +22,48 @@ const activeType = computed(() =>
   typeof route.query.type === "string" ? route.query.type : "",
 );
 const typeName = computed(() => getTypeName(activeTab.value, activeType.value));
-const filtered = computed(() =>
-  filterGoods({
+const sort = computed(() =>
+  ["priceAsc", "priceDesc"].includes(route.query.sort)
+    ? route.query.sort
+    : "recommended",
+);
+const filtered = computed(() => {
+  const result = filterGoods({
     query: keyword.value,
     category: activeTab.value,
     type: activeType.value,
-  }),
-);
+  });
+  return sort.value === "recommended"
+    ? result
+    : [...result].sort((a, b) =>
+        sort.value === "priceAsc" ? a.price - b.price : b.price - a.price,
+      );
+});
+function updateSort(value) {
+  router.replace({
+    path: "/",
+    query: {
+      ...route.query,
+      sort: value === "recommended" ? undefined : value,
+    },
+  });
+}
+function removeFilter(key) {
+  previousFilters.value = { ...route.query };
+  const query = { ...route.query };
+  delete query[key];
+  if (key === "category") delete query.type;
+  router.push({ path: "/", query });
+}
+function clearFilters() {
+  previousFilters.value = { ...route.query };
+  router.push({ path: "/", query: { sort: route.query.sort } });
+}
+function undoFilters() {
+  const query = previousFilters.value;
+  previousFilters.value = null;
+  router.push({ path: "/", query });
+}
 const columnCount = ref(4);
 function updateColumns() {
   const width = window.innerWidth;
@@ -89,8 +125,7 @@ watch(
 <template>
   <div class="market-home">
     <div class="section-eyebrow">
-      <span><i></i> THE SECOND LIFE OF GOOD THINGS</span
-      ><span>每一件好物，都值得再次被喜欢。</span>
+      <span><i></i> 闲置集市</span><span>商品为展示示例，交易服务尚未开放</span>
     </div>
     <section class="discovery" aria-label="发现好物">
       <CategoryNav
@@ -116,7 +151,7 @@ watch(
             发现心动好物 <MarketIcon name="arrow" :size="18" />
           </button>
           <div class="hero-caption">
-            <span>PRE-LOVED, RE-LOVED.</span><span>精选闲置 / 循环生活</span>
+            <span>个人闲置，重新被喜欢。</span><span>精选闲置 / 循环生活</span>
           </div>
         </div>
         <RouterLink class="hero-product-label" to="/goods/1"
@@ -129,13 +164,12 @@ watch(
     <div class="trust-strip">
       <span><MarketIcon name="shield" :size="17" />个人闲置，真实分享</span
       ><span><MarketIcon name="heart" :size="17" />让喜欢，不止一次</span
-      ><span><MarketIcon name="spark" :size="17" />理性消费，轻盈生活</span
-      ><span class="trust-note">GOOD FINDS. BETTER LIVING.</span>
+      ><span><MarketIcon name="spark" :size="17" />理性消费，轻盈生活</span>
     </div>
     <section class="collections" aria-label="精选频道">
       <div class="section-heading">
         <div>
-          <span class="overline">THE CURATED EDIT</span>
+          <span class="overline">按兴趣浏览</span>
           <h2>从你的热爱出发<span>四种生活灵感，慢慢挑。</span></h2>
         </div>
         <button class="text-link" @click="showFeed()">
@@ -169,11 +203,18 @@ watch(
     <section ref="feedRef" class="feed-section" aria-label="推荐商品">
       <div class="section-heading">
         <div>
-          <span class="overline">DISCOVER YOUR NEXT FAVOURITE</span>
-          <h2>刚刚好，是你想要的<span>好物不必昂贵，喜欢自有价值。</span></h2>
+          <span class="overline">商品列表</span>
+          <h2>
+            {{ keyword ? "搜索结果" : "发现好物"
+            }}<span>选择分类或排序，找到适合你的闲置。</span>
+          </h2>
         </div>
-        <span class="feed-counter"
-          ><span></span>{{ filtered.length }} 件好物，等待相遇</span
+        <span
+          class="feed-counter"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          ><span></span>共 {{ filtered.length }} 件商品</span
         >
       </div>
       <div class="feed-toolbar">
@@ -188,19 +229,45 @@ watch(
             {{ tab.name }}<span v-if="activeTab === tab.id"></span>
           </button>
         </div>
-        <span class="feed-sort"
-          >为你精选 <MarketIcon name="spark" :size="15"
-        /></span>
+        <label class="sort-control"
+          >排序
+          <select :value="sort" @change="updateSort($event.target.value)">
+            <option value="recommended">默认推荐</option>
+            <option value="priceAsc">价格从低到高</option>
+            <option value="priceDesc">价格从高到低</option>
+          </select></label
+        >
       </div>
       <div v-if="isFiltered" class="filter-summary">
-        <span
-          >{{
-            keyword
-              ? "“" + keyword + "” 的搜索结果"
-              : [currentCategory, typeName].filter(Boolean).join(" / ")
-          }}
-          · {{ filtered.length }} 件</span
-        ><button @click="router.push('/')">清除筛选 ×</button>
+        <div class="active-filters">
+          <span>已选条件</span
+          ><button
+            v-if="keyword"
+            @click="removeFilter('q')"
+            :aria-label="'移除关键词 ' + keyword"
+          >
+            关键词：{{ keyword }} ×</button
+          ><button
+            v-if="activeTab !== 'all'"
+            @click="removeFilter('category')"
+            :aria-label="'移除分类 ' + currentCategory"
+          >
+            {{ currentCategory }} ×</button
+          ><button
+            v-if="activeType"
+            @click="removeFilter('type')"
+            :aria-label="'移除类型 ' + typeName"
+          >
+            {{ typeName }} ×
+          </button>
+        </div>
+        <button @click="clearFilters">清除全部条件</button>
+      </div>
+      <div v-if="previousFilters" class="undo-bar" role="status">
+        筛选条件已更新 <button @click="undoFilters">撤销上次移除</button
+        ><button aria-label="关闭撤销提示" @click="previousFilters = null">
+          ×
+        </button>
       </div>
       <div
         v-if="filtered.length"
@@ -215,8 +282,14 @@ watch(
           <GoodsCard v-for="item in column" :key="item.id" :goods="item" />
         </div>
       </div>
-      <el-empty v-else description="暂时没找到这件好物，换个关键词试试吧"
-        ><el-button @click="router.push('/')">看看全部好物</el-button></el-empty
+      <el-empty
+        v-else
+        description="没有符合这些条件的商品。试试减少筛选条件，或搜索其他名称。"
+        ><el-button type="primary" @click="clearFilters"
+          >清除条件，查看全部</el-button
+        ><button v-if="keyword" class="text-link" @click="removeFilter('q')">
+          仅移除关键词
+        </button></el-empty
       >
       <div class="feed-end"><span></span>慢慢逛，好物总会相遇<span></span></div>
     </section>

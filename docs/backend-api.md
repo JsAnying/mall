@@ -200,7 +200,7 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
     "title": "让喜欢的好物，续写新的故事。",
     "subtitle": "不必全新，也能怦然心动。在这里，遇见有故事的物件。",
     "buttonText": "发现心动好物",
-    "imageUrl": "/media/banner/daily-picks.webp",
+    "imageUrl": "/api/media/banner/daily-picks.webp",
     "targetCategoryId": null
   },
   "channels": [
@@ -209,18 +209,18 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
       "title": "衣橱捡漏",
       "subtitle": "好穿搭，不必花大价钱",
       "categoryId": "fashion",
-      "decorationUrl": "/media/channels/fashion.webp",
+      "decorationUrl": "/api/media/channels/fashion.webp",
       "backgroundColor": "#fff0ec",
       "goods": [
-        { "id": "10003", "title": "复古运动鞋", "coverUrl": "/media/goods/shoe.webp", "price": 239 },
-        { "id": "10007", "title": "法式复古托特包", "coverUrl": "/media/goods/bag.webp", "price": 159 }
+        { "id": "10003", "title": "复古运动鞋", "coverUrl": "/api/media/goods/shoe.webp", "price": 239 },
+        { "id": "10007", "title": "法式复古托特包", "coverUrl": "/api/media/goods/bag.webp", "price": 159 }
       ]
     }
   ]
 }
 ```
 
-新版首页使用四个摄影频道卡片，decorationUrl 为频道主图；goods 为可选扩展数据，当前模板不渲染迷你商品。频道最多 4 个，每个最多 2 件可售商品；空频道不展示。图片 URL 应为同源地址或可信媒体域名。开发建议使用 `/api/media/**`，可直接经过现有 Vite `/api` 代理；本篇 `/media/**` 示例使用时需改为 `/api/media/**` 或另配 Vite 代理。链接目标由 categoryId 或 goods ID 决定，不允许任意跳转脚本。
+新版首页使用四个摄影频道卡片，decorationUrl 为频道主图；goods 为可选扩展数据，当前模板不渲染迷你商品。频道最多 4 个，每个最多 2 件可售商品；空频道不展示。图片 URL 应为同源地址或可信媒体域名。开发建议使用 `/api/media/**`，可直接经过现有 Vite `/api` 代理；若改用 `/media/**`，需另配 Vite 代理。链接目标由 categoryId 或 goods ID 决定，不允许任意跳转脚本。
 
 ## 5. 商品
 
@@ -237,8 +237,8 @@ HTTP 401 会使前端清除登录态并跳转登录。登录、注册请求已�
   "originalPrice": 799,
   "condition": "LIKE_NEW",
   "conditionLabel": "95新",
-  "coverUrl": "/media/goods/shoe.webp",
-  "images": [{ "fileId": "file-2001", "url": "/media/goods/shoe.webp" }],
+  "coverUrl": "/api/media/goods/shoe.webp",
+  "images": [{ "fileId": "file-2001", "url": "/api/media/goods/shoe.webp" }],
   "seller": { "id": "10001", "nickname": "小林的衣橱", "avatarUrl": null },
   "sellerType": "PERSONAL",
   "location": "南京",
@@ -338,7 +338,7 @@ multipart 表单字段：
 ```json
 {
   "fileId": "file-2001",
-  "url": "/media/goods/shoe.webp",
+  "url": "/api/media/goods/shoe.webp",
   "width": 1200,
   "height": 1200,
   "size": 245760
@@ -371,7 +371,7 @@ multipart 表单字段：
   "orderNo": "SG202610060001",
   "status": "PENDING",
   "amount": 239,
-  "goods": { "id": "10003", "title": "New Balance 530 复古运动鞋 37码", "coverUrl": "/media/goods/shoe.webp", "conditionLabel": "95新", "price": 239 },
+  "goods": { "id": "10003", "title": "New Balance 530 复古运动鞋 37码", "coverUrl": "/api/media/goods/shoe.webp", "conditionLabel": "95新", "price": 239 },
   "buyer": { "id": "10002", "nickname": "周末散步", "avatarUrl": null },
   "seller": { "id": "10001", "nickname": "小林的衣橱", "avatarUrl": null },
   "remark": "希望周末同城交付",
@@ -484,3 +484,4 @@ Invoke-RestMethod -Uri 'http://localhost:8080/api/goods?categoryId=digital&typeI
 ```
 
 示例账号需先注册，且只有后端实现并启动后这些命令才可执行。
+

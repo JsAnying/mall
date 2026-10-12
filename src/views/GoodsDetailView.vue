@@ -2,6 +2,18 @@
 import { computed } from "vue";
 import { goods } from "@/data/market.js";
 import ProductArt from "@/components/ProductVisual.vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+function goBack() {
+  const back = router.options.history.state.back;
+  if (
+    typeof back === "string" &&
+    back.startsWith("/") &&
+    !back.startsWith("//")
+  )
+    router.back();
+  else router.push("/");
+}
 const props = defineProps({ id: { type: String, required: true } });
 const product = computed(() =>
   goods.find((item) => String(item.id) === props.id),
@@ -17,7 +29,7 @@ const product = computed(() =>
       />
     </div>
     <div class="detail-info">
-      <RouterLink class="back-link" to="/">← 返回集市</RouterLink>
+      <button class="back-link" @click="goBack">← 返回商品列表</button>
       <p class="detail-label">个人闲置 · {{ product.condition }}</p>
       <h1>{{ product.title }}</h1>
       <p class="detail-price">
@@ -39,17 +51,24 @@ const product = computed(() =>
         {{ product.seller }} 的个人闲置，愿它在新的生活里继续发光。
       </p>
       <el-alert
-        title="Mock 商品展示，交易与联系卖家功能待后端接入。"
+        title="此商品为展示示例，交易与联系卖家尚未开放。"
         type="info"
         :closable="false"
       />
+      <div class="detail-actions">
+        <el-button type="primary" disabled>发起交易（尚未开放）</el-button
+        ><el-button disabled>联系卖家（尚未开放）</el-button>
+      </div>
+      <p class="detail-help">
+        购买前请核对成色、配件和瑕疵。此页不会创建订单或收取费用。
+      </p>
     </div>
   </div>
   <el-result
     v-else
     icon="info"
     title="暂时没有这件商品"
-    sub-title="该商品不在当前 Mock 数据中"
+    sub-title="这件商品可能已移除，返回列表寻找其他好物。"
     ><template #extra
       ><el-button @click="$router.push('/')">返回集市</el-button></template
     ></el-result

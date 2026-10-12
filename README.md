@@ -4,6 +4,10 @@ Vue 3（Composition API / `<script setup>`）+ Vite + Element Plus + Pinia + Axi
 
 后端对接见 [REST API 接口文档](docs/backend-api.md)，包含已接入认证接口约定与待实现的商品、图片、订单、分类和反馈接口设计。
 
+本地 IDE 创建后端、依赖、MySQL、JWT 配置与启动验证见 [Spring Boot 建项目步骤](docs/backend-setup.md)。
+
+界面结构、交互状态和尼尔森十项原则的落地验收见 [可用性设计规范](docs/usability-design.md)。登录/注册有内联错误恢复，发布支持本机草稿与预览，交易和订单服务仍待后端开放。
+
 ## 启动与验证
 
 Node.js 20.19+ 或 22.12+（推荐使用当前 LTS）。当前目录已经包含完整工程，无需再次运行脚手架。

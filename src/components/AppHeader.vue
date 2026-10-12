@@ -1,13 +1,55 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user.js";
 import { hotSearches } from "@/data/market.js";
 import MarketIcon from "./MarketIcon.vue";
+import {
+  readPreference,
+  writePreference,
+  rememberSearch,
+} from "@/utils/preferences.js";
+import { ElMessage } from "element-plus";
 const router = useRouter();
 const route = useRoute();
 const user = useUserStore();
 const keyword = ref("");
+const searchInput = ref();
+const suggestionsOpen = ref(false);
+const savedHistory = readPreference("market_search_history", []);
+const history = ref(
+  (Array.isArray(savedHistory) ? savedHistory : [])
+    .filter((item) => typeof item === "string")
+    .slice(0, 6),
+);
+const removedHistory = ref(null);
+function clearHistory() {
+  searchInput.value?.focus();
+  removedHistory.value = [...history.value];
+  history.value = [];
+  writePreference("market_search_history", []);
+}
+function undoHistory() {
+  searchInput.value?.focus();
+  history.value = removedHistory.value;
+  removedHistory.value = null;
+  writePreference("market_search_history", history.value);
+}
+function shortcut(event) {
+  const editing = event.target.closest?.(
+    "input,textarea,select,[contenteditable=true]",
+  );
+  if (
+    (event.key === "/" && !editing && !event.ctrlKey && !event.metaKey) ||
+    ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k")
+  ) {
+    event.preventDefault();
+    searchInput.value?.focus();
+    suggestionsOpen.value = true;
+  }
+}
+onMounted(() => window.addEventListener("keydown", shortcut));
+onUnmounted(() => window.removeEventListener("keydown", shortcut));
 watch(
   () => route.query.q,
   (value) => {
@@ -16,10 +58,21 @@ watch(
   { immediate: true },
 );
 function search(value = keyword.value) {
-  router.push({ path: "/", query: value.trim() ? { q: value.trim() } : {} });
+  const text = value.trim().slice(0, 100);
+  keyword.value = text;
+  history.value = rememberSearch(history.value, text);
+  removedHistory.value = null;
+  writePreference("market_search_history", history.value);
+  suggestionsOpen.value = false;
+  searchInput.value?.blur();
+  router.push({
+    path: "/",
+    query: { ...(route.path === "/" ? route.query : {}), q: text || undefined },
+  });
 }
 function logout() {
   user.logout();
+  ElMessage.success("已退出登录，你仍可以浏览商品");
   router.replace("/");
 }
 </script>
@@ -58,19 +111,56 @@ function logout() {
           ><small>SHIGUANG MARKET</small></span
         ></RouterLink
       >
-      <div class="header-search">
+      <div
+        class="header-search"
+        @focusout="
+          (event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              suggestionsOpen = false;
+          }
+        "
+        @keydown.esc="suggestionsOpen = false"
+      >
         <form class="search-capsule" role="search" @submit.prevent="search()">
           <MarketIcon name="search" :size="18" /><input
             v-model="keyword"
+            ref="searchInput"
+            maxlength="100"
+            autocomplete="off"
+            @focus="suggestionsOpen = true"
+            :aria-expanded="suggestionsOpen"
+            aria-controls="search-suggestions"
             aria-label="搜索闲置商品"
-            placeholder="寻找下一件，属于你的好物"
+            placeholder="搜索商品名称或品牌"
             type="search"
           /><button type="submit">
             搜索 <MarketIcon name="arrow" :size="15" />
           </button>
         </form>
+        <div
+          v-if="suggestionsOpen"
+          id="search-suggestions"
+          class="search-suggestions"
+        >
+          <div class="suggestion-heading">
+            <strong>最近搜索</strong
+            ><button v-if="history.length" @click="clearHistory">
+              清空记录</button
+            ><button @click="suggestionsOpen = false">关闭</button>
+          </div>
+          <div class="history-tags">
+            <button v-for="item in history" :key="item" @click="search(item)">
+              {{ item }}
+            </button>
+          </div>
+          <p v-if="!history.length">还没有搜索记录。试试“相机”或“耳机”。</p>
+          <div v-if="removedHistory" class="history-undo" role="status">
+            记录已清空 <button @click="undoHistory">撤销</button>
+          </div>
+          <small>Enter 搜索 · Escape 关闭 · Ctrl / ⌘ + K 快速搜索</small>
+        </div>
         <div class="hot-searches">
-          <span>灵感热搜</span
+          <span>热门搜索</span
           ><button v-for="tag in hotSearches" :key="tag" @click="search(tag)">
             {{ tag }}
           </button>
@@ -110,19 +200,19 @@ function logout() {
         ><RouterLink
           to="/?category=digital"
           :class="{ current: route.query.category === 'digital' }"
-          >数码灵感</RouterLink
+          >手机数码</RouterLink
         ><RouterLink
           to="/?category=fashion"
           :class="{ current: route.query.category === 'fashion' }"
-          >衣橱新生</RouterLink
+          >服装鞋包</RouterLink
         ><RouterLink
           to="/?category=home"
           :class="{ current: route.query.category === 'home' }"
-          >生活美学</RouterLink
+          >家居生活</RouterLink
         ><RouterLink
           to="/?category=toys"
           :class="{ current: route.query.category === 'toys' }"
-          >热爱收藏</RouterLink
+          >潮玩收藏</RouterLink
         >
       </nav>
       <RouterLink class="header-publish" to="/publish"
