@@ -4,6 +4,9 @@ defineProps({
   size: { type: [Number, String], default: 22 },
 });
 const paths = {
+  close: "m6 6 12 12 M6 18 18 6",
+  grid: "M3 3h7v7H3V3 M14 3h7v7h-7V3 M3 14h7v7H3v-7 M14 14h7v7h-7v-7",
+  filter: "M3 5h18 M6 12h12 M10 19h4",
   search: "m21 21-5-5 M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0",
   phone:
     "M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2 M10 5h4 M11 19h2",

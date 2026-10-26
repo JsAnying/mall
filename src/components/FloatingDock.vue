@@ -142,115 +142,15 @@ function backToTop() {
 </template>
 
 <style scoped>
-.floating-dock {
-  position: fixed;
-  right: 17px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  z-index: 30;
-  background: #fffefaed;
-  border: 1px solid #e5e8dc;
-  border-radius: 14px;
-  backdrop-filter: blur(15px);
-  padding: 8px 5px;
-  width: 56px;
-  box-shadow: 0 6px 24px #3c4c2910;
-}
-.floating-dock > button,
-.dock-publish {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 8px;
-  padding: 11px 0;
-  border-radius: 8px;
-  width: 100%;
-  color: #9ba38d;
-  transition:
-    background 0.2s,
-    color 0.2s;
-}
-.floating-dock > button:hover {
-  background: #f3f3e9;
-  color: var(--accent);
-}
-.floating-dock > button svg {
-  width: 19px;
-  height: 19px;
-}
-.dock-publish {
-  padding: 0 0 8px;
-  color: var(--accent);
-}
-.dock-publish > span {
-  display: grid;
-  place-items: center;
-  width: 37px;
-  height: 37px;
-  border-radius: 10px;
-  background: #f4e9df;
-  border: 1px solid #ead6c5;
-  color: var(--accent);
-  transition: background 0.2s;
-}
-.dock-publish:hover > span {
-  background: #ecddd0;
-}
-.dock-publish > span svg {
-  width: 23px;
-  height: 23px;
-}
-.dock-publish b {
-  font-size: 8px;
-  font-weight: 450;
-}
-.dock-top {
-  border-top: 1px solid var(--line);
-  border-radius: 0 !important;
-}
-.dialog-note {
-  font-size: 12px;
-  line-height: 1.8;
-  color: #929a87;
-}
-.mobile-symbol {
-  display: grid;
-  place-items: center;
-  color: var(--accent);
-  padding: 20px;
-}
-.feedback-label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 13px;
-}
-@media (max-width: 800px) {
-  .floating-dock {
-    top: auto;
-    bottom: 18px;
-    right: 14px;
-    transform: none;
-    padding: 5px;
-    width: 47px;
-    border-radius: 12px;
-  }
-  .floating-dock > button {
-    display: none;
-  }
-  .dock-publish {
-    padding: 0;
-  }
-  .dock-publish b {
-    font-size: 7px;
-  }
-  .dock-publish > span {
-    width: 35px;
-    height: 35px;
-  }
-}
+.floating-dock { grid-column: 2; display: flex; align-items: center; justify-content: flex-end; gap: 24px; padding: 8px 0; }
+.floating-dock > button, .dock-publish { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 4px; font-size: 12px; color: var(--text-secondary); }
+.floating-dock svg { width: 17px; height: 17px; }
+.floating-dock b { font-size: 12px; font-weight: 500; }
+.dock-publish > span { display: flex; }
+.floating-dock > button:hover, .dock-publish:hover { color: var(--accent); }
+.dialog-note { font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
+.mobile-symbol { display: flex; justify-content: center; color: var(--accent); padding: 20px; }
+.feedback-label { display: block; margin-bottom: 12px; font-size: 14px; }
+@media (max-width: 800px) { .floating-dock { grid-column: 1; justify-content: space-between; gap: 8px; padding: 8px 4px; } }
+@media (max-width: 450px) { .floating-dock > button, .dock-publish { flex-direction: column; gap: 3px; font-size: 11px; min-width: 44px; } .floating-dock b { font-size: 11px; } }
 </style>

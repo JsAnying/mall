@@ -6,6 +6,10 @@ Vue 3（Composition API / `<script setup>`）+ Vite + Element Plus + Pinia + Axi
 
 本地 IDE 创建后端、依赖、MySQL、JWT 配置与启动验证见 [Spring Boot 建项目步骤](docs/backend-setup.md)。
 
+后端采用 MyBatis Framework + Lombok，教程包含匹配版本的 starter、Mapper/XML、手动建表与注解处理配置。
+
+全项目 15 张表、分类/首页初始数据与只读验收脚本见 [SQL 执行说明](docs/sql/README.md)，按 01 → 02 → 03 在空开发库中执行。
+
 界面结构、交互状态和尼尔森十项原则的落地验收见 [可用性设计规范](docs/usability-design.md)。登录/注册有内联错误恢复，发布支持本机草稿与预览，交易和订单服务仍待后端开放。
 
 ## 启动与验证
@@ -98,7 +102,7 @@ const goods = await request.get('/goods', { params: { page: 1, size: 20 } })
 | POST | `/api/auth/login` | `{ username, password }` | `{ token, userInfo }` |
 | POST | `/api/auth/register` | `{ username, password }` | 按后端约定，页面无需读取 |
 
-登录注册表单已接入这些接口，后端尚未运行时会显示请求失败。首页与商品详情采用本地 Mock 商品；发布和订单页面仍为骨架，没有模拟交易或虚构登录。注册密码至少 6 位只是前端初始规则，最终需与后端校验对齐。
+登录注册表单已写 API 调用，后端尚未运行时会显示持续错误并允许重试或停止等待。首页与详情仍用本地展示数据；发布已支持本机草稿、预览、离开保护及清除撤销，不上传/上架；订单已支持买入/卖出切换，真实记录未接入。注册校验为用户名 3–32 位字母/数字/下划线、密码 6–64 位且 UTF-8 最多 72 字节、两次输入一致，后端必须独立校验。2026-10-12 更新的接口契约 v1.1 与建项目教程已对齐这些行为。
 
 ## 首页 UI 与离线 Mock
 

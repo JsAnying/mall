@@ -23,6 +23,6 @@ router.beforeEach((to) => {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 })
-router.afterEach((to) => { document.title = `${to.meta.title || '闲置集市'} · 二手交易平台` })
+router.afterEach((to) => { document.title = `${to.meta.title || '闲置集市'} · 拾光闲置` })
 
 export default router

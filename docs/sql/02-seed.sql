@@ -1,0 +1,138 @@
+-- 02 初始分类与首页配置，匹配 src/data/market.js、categoryTypes.js。
+-- 仅在空表上执行一次；没有默认账号、模拟订单或伪造商品。
+USE shiguang_market_dev;
+SET NAMES utf8mb4;
+SET time_zone = '+00:00';
+START TRANSACTION;
+
+INSERT INTO categories (id, name, icon, hint, sort_order, enabled) VALUES
+    ('digital', '手机数码', 'phone', '手机 / 相机 / 电脑', 1, 1),
+    ('fashion', '服装鞋包', 'bag', '穿搭 / 鞋履 / 箱包', 2, 1),
+    ('toys', '潮玩手办', 'star', '积木 / 手办 / 收藏', 3, 1),
+    ('beauty', '美妆个护', 'spark', '香氛 / 美容 / 护理', 4, 1),
+    ('books', '图书文娱', 'book', '好书 / 黑胶 / 游戏', 5, 1),
+    ('home', '家居生活', 'home', '家具 / 绿植 / 小家电', 6, 1),
+    ('sports', '运动户外', 'bike', '露营 / 骑行 / 运动', 7, 1),
+    ('music', '乐器设备', 'music', '吉他 / 键盘 / 音响', 8, 1);
+
+INSERT INTO category_groups (id, category_id, title, sort_order) VALUES
+    (11, 'digital', '手机与电脑', 1),
+    (12, 'digital', '影音与游戏', 2),
+    (13, 'digital', '智能与配件', 3),
+    (21, 'fashion', '衣橱好物', 1),
+    (22, 'fashion', '鞋履箱包', 2),
+    (23, 'fashion', '穿搭配饰', 3),
+    (31, 'toys', '潮玩收藏', 1),
+    (32, 'toys', '拼搭与模型', 2),
+    (33, 'toys', '动漫周边', 3),
+    (41, 'beauty', '香氛彩妆', 1),
+    (42, 'beauty', '个护电器', 2),
+    (43, 'beauty', '日常护理', 3),
+    (51, 'books', '图书阅读', 1),
+    (52, 'books', '音乐与影视', 2),
+    (53, 'books', '休闲娱乐', 3),
+    (61, 'home', '家居装饰', 1),
+    (62, 'home', '家具收纳', 2),
+    (63, 'home', '生活电器', 3),
+    (71, 'sports', '户外出行', 1),
+    (72, 'sports', '运动装备', 2),
+    (73, 'sports', '健身训练', 3),
+    (81, 'music', '弦乐与键盘', 1),
+    (82, 'music', '录音与演出', 2),
+    (83, 'music', '乐器配件', 3);
+
+INSERT INTO category_types (category_id, id, group_id, name, sort_order, enabled) VALUES
+    ('digital', 'phone', 11, '手机', 1, 1),
+    ('digital', 'tablet', 11, '平板电脑', 2, 1),
+    ('digital', 'laptop', 11, '笔记本电脑', 3, 1),
+    ('digital', 'monitor', 11, '显示器', 4, 1),
+    ('digital', 'camera', 12, '相机', 1, 1),
+    ('digital', 'headphones', 12, '耳机', 2, 1),
+    ('digital', 'console', 12, '游戏机', 3, 1),
+    ('digital', 'speaker', 12, '音响', 4, 1),
+    ('digital', 'watch', 13, '智能手表', 1, 1),
+    ('digital', 'keyboard', 13, '键盘鼠标', 2, 1),
+    ('digital', 'charger', 13, '充电配件', 3, 1),
+    ('fashion', 'coat', 21, '外套', 1, 1),
+    ('fashion', 'shirt', 21, '上衣', 2, 1),
+    ('fashion', 'dress', 21, '裙装', 3, 1),
+    ('fashion', 'trousers', 21, '裤装', 4, 1),
+    ('fashion', 'shoe', 22, '运动鞋', 1, 1),
+    ('fashion', 'boots', 22, '靴子', 2, 1),
+    ('fashion', 'bag', 22, '手提包 / 托特包', 3, 1),
+    ('fashion', 'backpack', 22, '背包', 4, 1),
+    ('fashion', 'suitcase', 22, '行李箱', 5, 1),
+    ('fashion', 'hat', 23, '帽子', 1, 1),
+    ('fashion', 'scarf', 23, '围巾', 2, 1),
+    ('fashion', 'jewelry', 23, '首饰', 3, 1),
+    ('toys', 'toy', 31, '手办 / 摆件', 1, 1),
+    ('toys', 'blind-box', 31, '盲盒', 2, 1),
+    ('toys', 'plush', 31, '毛绒玩具', 3, 1),
+    ('toys', 'blocks', 32, '积木', 1, 1),
+    ('toys', 'model', 32, '模型', 2, 1),
+    ('toys', 'puzzle', 32, '拼图', 3, 1),
+    ('toys', 'badge', 33, '徽章', 1, 1),
+    ('toys', 'card', 33, '收藏卡', 2, 1),
+    ('toys', 'poster', 33, '海报', 3, 1),
+    ('beauty', 'perfume', 41, '香水', 1, 1),
+    ('beauty', 'lipstick', 41, '口红', 2, 1),
+    ('beauty', 'makeup', 41, '彩妆工具', 3, 1),
+    ('beauty', 'hairdryer', 42, '吹风机', 1, 1),
+    ('beauty', 'beauty-device', 42, '美容仪', 2, 1),
+    ('beauty', 'shaver', 42, '剃须刀', 3, 1),
+    ('beauty', 'skincare', 43, '护肤品', 1, 1),
+    ('beauty', 'haircare', 43, '护发用品', 2, 1),
+    ('books', 'books', 51, '文学 / 小说', 1, 1),
+    ('books', 'textbook', 51, '教材', 2, 1),
+    ('books', 'comic', 51, '漫画', 3, 1),
+    ('books', 'magazine', 51, '杂志', 4, 1),
+    ('books', 'vinyl', 52, '黑胶唱片', 1, 1),
+    ('books', 'cd', 52, 'CD / DVD', 2, 1),
+    ('books', 'boardgame', 53, '桌游', 1, 1),
+    ('books', 'stationery', 53, '文具', 2, 1),
+    ('home', 'lamp', 61, '灯具', 1, 1),
+    ('home', 'plant', 61, '绿植 / 花盆', 2, 1),
+    ('home', 'decoration', 61, '装饰摆件', 3, 1),
+    ('home', 'desk', 62, '桌椅', 1, 1),
+    ('home', 'cabinet', 62, '柜子', 2, 1),
+    ('home', 'storage', 62, '收纳用品', 3, 1),
+    ('home', 'coffee-machine', 63, '咖啡机', 1, 1),
+    ('home', 'kitchen', 63, '厨房电器', 2, 1),
+    ('home', 'cleaner', 63, '清洁电器', 3, 1),
+    ('sports', 'tent', 71, '帐篷', 1, 1),
+    ('sports', 'camping', 71, '露营装备', 2, 1),
+    ('sports', 'bike', 71, '自行车', 3, 1),
+    ('sports', 'shoe', 72, '徒步 / 运动鞋', 1, 1),
+    ('sports', 'sportswear', 72, '运动服饰', 2, 1),
+    ('sports', 'racket', 72, '球拍', 3, 1),
+    ('sports', 'fitness', 73, '健身器械', 1, 1),
+    ('sports', 'yoga', 73, '瑜伽用品', 2, 1),
+    ('music', 'guitar', 81, '吉他', 1, 1),
+    ('music', 'ukulele', 81, '尤克里里', 2, 1),
+    ('music', 'piano', 81, '电钢琴', 3, 1),
+    ('music', 'violin', 81, '小提琴', 4, 1),
+    ('music', 'microphone', 82, '麦克风', 1, 1),
+    ('music', 'audio-interface', 82, '声卡', 2, 1),
+    ('music', 'speaker', 82, '音箱', 3, 1),
+    ('music', 'strings', 83, '琴弦', 1, 1),
+    ('music', 'music-accessories', 83, '支架 / 琴包', 2, 1);
+
+INSERT INTO home_hot_searches (id, keyword, sort_order, enabled) VALUES
+    (1, 'iPhone 15', 1, 1),
+    (2, '富士 X100V', 2, 1),
+    (3, '复古', 3, 1),
+    (4, 'Switch', 4, 1),
+    (5, '户外徒步', 5, 1),
+    (6, '香水', 6, 1),
+    (7, '吉他', 7, 1);
+
+INSERT INTO home_banners (id, title, subtitle, button_text, image_url, target_category_id, sort_order, enabled) VALUES
+    (1, '让喜欢的好物，续写新的故事。', '不必全新，也能怦然心动。在这里，遇见有故事的物件。', '发现心动好物', '/images/editorial-hero.png', NULL, 1, 1);
+
+INSERT INTO home_channels (id, category_id, title, subtitle, decoration_url, background_color, sort_order, enabled) VALUES
+    ('fashion', 'fashion', '衣橱捡漏', '好穿搭，不必花大价钱', '/images/tote.png', '#fff0ec', 1, 1),
+    ('digital', 'digital', '手机数码', '心动装备，轻松拥有', '/images/headphones.png', '#edf1ff', 2, 1),
+    ('toys', 'toys', '二次元宇宙', '你的热爱，值得收藏', '/images/toy.png', '#f5edff', 3, 1),
+    ('home', 'home', '生活有好物', '把日子过成喜欢的样子', '/images/lamp.png', '#edf5ee', 4, 1);
+
+COMMIT;

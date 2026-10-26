@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import MarketIcon from "@/components/MarketIcon.vue";
 const route = useRoute(),
   router = useRouter();
 const tab = computed({
@@ -18,7 +19,6 @@ const tab = computed({
       <RouterLink class="back-action" to="/">← 返回首页</RouterLink>
       <div class="workspace-heading">
         <div>
-          <span class="eyebrow">个人中心</span>
           <h1>我的订单</h1>
           <p>买入和卖出分开查看，交易进度清楚可见。</p>
         </div>
@@ -37,7 +37,7 @@ const tab = computed({
         </p>
       </div>
       <div class="service-empty">
-        <span class="empty-symbol">▤</span>
+        <span class="empty-symbol"><MarketIcon name="order" :size="40" /></span>
         <h2>开放后，在这里跟进每笔交易</h2>
         <p>
           {{
@@ -54,7 +54,6 @@ const tab = computed({
       </div>
     </section>
     <aside class="workspace-aside">
-      <span class="eyebrow">交易流程</span>
       <h2>每一步都有记录</h2>
       <ol>
         <li>买家发起交易</li>

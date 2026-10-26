@@ -211,7 +211,6 @@ onUnmounted(() => window.removeEventListener("beforeunload", beforeUnload));
       <RouterLink class="back-action" to="/">← 返回首页</RouterLink>
       <div class="workspace-heading">
         <div>
-          <span class="eyebrow">我的闲置</span>
           <h1>{{ route.query.id ? "准备编辑信息" : "准备发布闲置" }}</h1>
           <p>写清使用情况，让下一位使用者放心挑选。</p>
         </div>
@@ -340,7 +339,6 @@ onUnmounted(() => window.removeEventListener("beforeunload", beforeUnload));
       </el-form>
     </section>
     <aside class="workspace-aside">
-      <span class="eyebrow">填写小提示</span>
       <h2>让好物被放心选择</h2>
       <ul>
         <li>标题写出品牌、型号和关键特点。</li>
@@ -351,7 +349,7 @@ onUnmounted(() => window.removeEventListener("beforeunload", beforeUnload));
       <p>想看完整说明？页面底部随时可以打开使用帮助。</p>
     </aside>
     <el-dialog v-model="preview" title="发布信息预览" width="min(560px, 92vw)"
-      ><span class="eyebrow">本机草稿 · 尚未发布</span>
+      ><p class="field-hint">本机草稿 · 尚未发布</p>
       <h2>{{ form.title }}</h2>
       <p class="preview-price">¥{{ Number(form.price).toLocaleString() }}</p>
       <p>{{ form.condition }} · {{ form.location }}</p>
@@ -386,8 +384,8 @@ onUnmounted(() => window.removeEventListener("beforeunload", beforeUnload));
   margin: 0 0 24px;
 }
 .form-section h2 span {
-  background: #edf0e7;
-  color: #485c38;
+  background: var(--active);
+  color: var(--accent);
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -405,9 +403,9 @@ onUnmounted(() => window.removeEventListener("beforeunload", beforeUnload));
 }
 .upload-placeholder {
   padding: 20px;
-  border: 1px dashed #bdc5b5;
-  border-radius: 12px;
-  background: #f8f9f4;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--control-radius);
+  background: var(--raised);
 }
 .upload-placeholder p {
   font-size: 14px;

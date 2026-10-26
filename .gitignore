@@ -4,3 +4,9 @@ dist/
 .env.*.local
 *.log
 .DS_Store
+
+# 本地设计检查与浏览器截图；方向和报告摘要单独保留。
+.taste-skill/before/
+.taste-skill/after/
+.taste-skill/checks/
+.impeccable/review/

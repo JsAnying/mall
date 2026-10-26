@@ -78,474 +78,91 @@ function logout() {
 </script>
 <template>
   <header class="market-header">
-    <div class="header-top">
-      <div class="header-top-inner">
-        <span>少一点闲置，多一点喜欢。</span
-        ><span>PRE-LOVED THINGS. NEW POSSIBILITIES.</span>
-      </div>
-    </div>
     <div class="header-main">
-      <RouterLink class="brand" to="/" aria-label="拾光闲置首页"
-        ><span class="brand-mark"
-          ><svg
-            width="29"
-            height="29"
-            viewBox="0 0 40 40"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M10 14 6 23l14 10 14-10-4-9-10 7-10-7Z"
-              stroke="currentColor"
-              stroke-width="2.4"
-              stroke-linejoin="round"
-            />
-            <path
-              d="m11 7 9 6 9-6M20 21v12"
-              stroke="currentColor"
-              stroke-width="2.4"
-              stroke-linecap="round"
-            /></svg></span
-        ><span
-          ><strong>拾光闲置<span>.</span></strong
-          ><small>SHIGUANG MARKET</small></span
-        ></RouterLink
-      >
-      <div
-        class="header-search"
-        @focusout="
-          (event) => {
-            if (!event.currentTarget.contains(event.relatedTarget))
-              suggestionsOpen = false;
-          }
-        "
-        @keydown.esc="suggestionsOpen = false"
-      >
-        <form class="search-capsule" role="search" @submit.prevent="search()">
-          <MarketIcon name="search" :size="18" /><input
-            v-model="keyword"
-            ref="searchInput"
-            maxlength="100"
-            autocomplete="off"
-            @focus="suggestionsOpen = true"
-            :aria-expanded="suggestionsOpen"
-            aria-controls="search-suggestions"
-            aria-label="搜索闲置商品"
-            placeholder="搜索商品名称或品牌"
-            type="search"
-          /><button type="submit">
-            搜索 <MarketIcon name="arrow" :size="15" />
-          </button>
+      <RouterLink class="brand" to="/" aria-label="拾光闲置首页">
+        <svg class="brand-mark" width="30" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M10 14 6 23l14 10 14-10-4-9-10 7-10-7Z" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+          <path d="m11 7 9 6 9-6M20 21v12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        </svg>
+        <span><strong>拾光闲置<span>.</span></strong><small>让好物，继续被喜欢</small></span>
+      </RouterLink>
+      <div class="header-search" @focusout="(event) => { if (!event.currentTarget.contains(event.relatedTarget)) suggestionsOpen = false; }" @keydown.esc="suggestionsOpen = false">
+        <form class="search-field" role="search" @submit.prevent="search()">
+          <MarketIcon name="search" :size="19" />
+          <input v-model="keyword" ref="searchInput" maxlength="100" autocomplete="off" @focus="suggestionsOpen = true" :aria-expanded="suggestionsOpen" aria-controls="search-suggestions" aria-label="搜索闲置商品" placeholder="搜一搜，找到你的下一件喜欢" type="search" />
+          <kbd aria-hidden="true">Ctrl K</kbd>
+          <button type="submit">搜索</button>
         </form>
-        <div
-          v-if="suggestionsOpen"
-          id="search-suggestions"
-          class="search-suggestions"
-        >
-          <div class="suggestion-heading">
-            <strong>最近搜索</strong
-            ><button v-if="history.length" @click="clearHistory">
-              清空记录</button
-            ><button @click="suggestionsOpen = false">关闭</button>
-          </div>
-          <div class="history-tags">
-            <button v-for="item in history" :key="item" @click="search(item)">
-              {{ item }}
-            </button>
-          </div>
-          <p v-if="!history.length">还没有搜索记录。试试“相机”或“耳机”。</p>
-          <div v-if="removedHistory" class="history-undo" role="status">
-            记录已清空 <button @click="undoHistory">撤销</button>
-          </div>
-          <small>Enter 搜索 · Escape 关闭 · Ctrl / ⌘ + K 快速搜索</small>
-        </div>
-        <div class="hot-searches">
-          <span>热门搜索</span
-          ><button v-for="tag in hotSearches" :key="tag" @click="search(tag)">
-            {{ tag }}
-          </button>
+        <div v-if="suggestionsOpen" id="search-suggestions" class="search-suggestions">
+          <div class="suggestion-heading"><strong>最近搜索</strong><button v-if="history.length" @click="clearHistory">清空</button><button aria-label="关闭搜索建议" @click="suggestionsOpen = false"><MarketIcon name="close" :size="18" /></button></div>
+          <div class="history-tags"><button v-for="item in history" :key="item" @click="search(item)">{{ item }}</button></div>
+          <p v-if="!history.length">还没有搜索记录，试试“相机”或“耳机”。</p>
+          <div v-if="removedHistory" class="history-undo" role="status">搜索记录已清空 <button @click="undoHistory">撤销</button></div>
+          <small>Enter 搜索 · Esc 关闭</small>
         </div>
       </div>
       <nav class="user-nav" aria-label="用户导航">
-        <div class="account-entry">
-          <span class="avatar-placeholder"
-            ><MarketIcon name="user" :size="19"
-          /></span>
-          <div v-if="!user.isLoggedIn">
-            <RouterLink to="/login">登录</RouterLink
-            ><span class="divider">/</span
-            ><RouterLink to="/register">注册</RouterLink
-            ><small>你的好物，从这里开始</small>
-          </div>
-          <div v-else>
-            <span>{{
-              user.userInfo?.nickname || user.userInfo?.username || "拾光用户"
-            }}</span
-            ><button class="logout-link" @click="logout">退出登录</button>
-          </div>
-        </div>
-        <RouterLink class="orders-entry" to="/user/orders"
-          ><MarketIcon name="order" :size="20" /><span
-            >我的订单</span
-          ></RouterLink
-        >
+        <div class="account-entry" v-if="!user.isLoggedIn"><RouterLink to="/login">登录</RouterLink><span aria-hidden="true">/</span><RouterLink to="/register">注册</RouterLink></div>
+        <div class="account-entry signed-in" v-else><span>{{ user.userInfo?.nickname || user.userInfo?.username || '拾光用户' }}</span><button @click="logout">退出</button></div>
+        <RouterLink class="orders-entry" to="/user/orders"><MarketIcon name="order" :size="19" /><span>订单</span></RouterLink>
+        <RouterLink class="header-publish" to="/publish"><MarketIcon name="plus" :size="18" /><span>发布闲置</span></RouterLink>
       </nav>
     </div>
     <div class="header-navigation">
       <nav aria-label="集市导航">
-        <RouterLink
-          to="/"
-          :class="{ current: route.path === '/' && !route.query.category }"
-          >发现好物</RouterLink
-        ><RouterLink
-          to="/?category=digital"
-          :class="{ current: route.query.category === 'digital' }"
-          >手机数码</RouterLink
-        ><RouterLink
-          to="/?category=fashion"
-          :class="{ current: route.query.category === 'fashion' }"
-          >服装鞋包</RouterLink
-        ><RouterLink
-          to="/?category=home"
-          :class="{ current: route.query.category === 'home' }"
-          >家居生活</RouterLink
-        ><RouterLink
-          to="/?category=toys"
-          :class="{ current: route.query.category === 'toys' }"
-          >潮玩收藏</RouterLink
-        >
+        <RouterLink to="/" :class="{ current: route.path === '/' && !route.query.category }" :aria-current="route.path === '/' && !route.query.category ? 'page' : undefined">发现好物</RouterLink>
+        <RouterLink to="/?category=digital" :class="{ current: route.path === '/' && route.query.category === 'digital' }">手机数码</RouterLink>
+        <RouterLink to="/?category=fashion" :class="{ current: route.path === '/' && route.query.category === 'fashion' }">服装鞋包</RouterLink>
+        <RouterLink to="/?category=home" :class="{ current: route.path === '/' && route.query.category === 'home' }">家居生活</RouterLink>
+        <RouterLink to="/?category=toys" :class="{ current: route.path === '/' && route.query.category === 'toys' }">潮玩收藏</RouterLink>
       </nav>
-      <RouterLink class="header-publish" to="/publish"
-        ><MarketIcon name="plus" :size="15" />发布闲置</RouterLink
-      >
+      <div class="hot-searches"><span>大家在搜</span><button v-for="tag in hotSearches.slice(0, 4)" :key="tag" @click="search(tag)">{{ tag }}</button></div>
     </div>
   </header>
 </template>
 <style scoped>
-.market-header {
-  background: #fffefa;
-  border-bottom: 1px solid var(--line);
-}
-.header-top {
-  background: #eeeee8;
-  color: #85877d;
-  font-size: 9px;
-}
-.header-top-inner {
-  max-width: 1200px;
-  margin: auto;
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.header-top-inner > span:last-child {
-  font-size: 8px;
-  letter-spacing: 1.7px;
-}
-.header-main {
-  max-width: 1200px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: 225px minmax(0, 1fr) 255px;
-  gap: 34px;
-  align-items: center;
-  min-height: 108px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 45px;
-  border-radius: 12px;
-  color: var(--accent);
-  border: 1px solid #de9b8538;
-  background: #f7ebe4;
-}
-.brand strong {
-  font-size: 24px;
-  font-weight: 650;
-  letter-spacing: -1px;
-  color: #323b2f;
-}
-.brand strong span {
-  color: var(--accent);
-}
-.brand small {
-  display: block;
-  font-size: 8px;
-  color: #a1a395;
-  letter-spacing: 2.3px;
-  margin-top: 5px;
-}
-.search-capsule {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  background: #f3f3ed;
-  border: 1px solid #eaeae1;
-  border-radius: 9px;
-  height: 43px;
-  padding: 4px 5px 4px 14px;
-  color: #9fa391;
-}
-.search-capsule:focus-within {
-  border-color: #baaf92;
-}
-.search-capsule input {
-  outline: 0;
-  border: 0;
-  background: none;
-  min-width: 0;
-  width: 100%;
-  font-size: 11px;
-  color: #59624d;
-}
-.search-capsule input::placeholder {
-  color: #a4a79a;
-}
-.search-capsule button {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  height: 32px;
-  padding: 0 13px;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px;
-}
-.hot-searches {
-  display: flex;
-  gap: 15px;
-  white-space: nowrap;
-  overflow: auto;
-  scrollbar-width: none;
-  margin: 9px 0 0 4px;
-  font-size: 9px;
-  color: #a6a89b;
-}
-.hot-searches button {
-  padding: 0;
-  color: #94998a;
-  font-size: 9px;
-}
-.hot-searches button:hover {
-  color: var(--accent);
-}
-.user-nav {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 26px;
-  padding-bottom: 14px;
-  font-size: 11px;
-  color: #626b59;
-}
-.account-entry {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.avatar-placeholder {
-  display: grid;
-  place-items: center;
-  border: 1px solid #e6e8dd;
-  border-radius: 50%;
-  background: #f6f6f1;
-  width: 34px;
-  height: 34px;
-  color: #919983;
-}
-.divider {
-  color: #b8bcaf;
-  margin: 0 5px;
-}
-.account-entry small {
-  display: block;
-  font-size: 9px;
-  color: #a7ab9e;
-  margin-top: 5px;
-}
-.orders-entry {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  font-size: 9px;
-}
-.logout-link {
-  font-size: 9px;
-  color: #a0a593;
-  padding: 0;
-  display: block;
-  margin-top: 4px;
-}
-.header-navigation {
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 45px;
-}
-.header-navigation > nav {
-  display: flex;
-  height: 100%;
-  gap: 38px;
-}
-.header-navigation > nav > a {
-  display: flex;
-  align-items: center;
-  position: relative;
-  color: #8c9182;
-  font-size: 11px;
-}
-.header-navigation > nav > a.current {
-  color: var(--accent);
-  font-weight: 550;
-}
-.header-navigation > nav > a.current::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent);
-}
-.header-publish {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #8b927f;
-}
-@media (max-width: 1360px) {
-  .header-top-inner,
-  .header-main,
-  .header-navigation {
-    margin-left: 40px;
-    margin-right: 85px;
-  }
-  .header-main {
-    grid-template-columns: 200px minmax(0, 1fr) 220px;
-    gap: 24px;
-  }
-}
-@media (max-width: 1000px) {
-  .header-main {
-    grid-template-columns: 175px minmax(0, 1fr) 180px;
-    gap: 20px;
-  }
-  .user-nav {
-    gap: 18px;
-  }
-  .account-entry small {
-    display: none;
-  }
-  .header-top-inner > span:last-child {
-    font-size: 7px;
-  }
-  .brand strong {
-    font-size: 22px;
-  }
-  .brand-mark {
-    width: 38px;
-  }
-  .hot-searches {
-    gap: 12px;
-  }
-  .header-navigation > nav {
-    gap: 28px;
-  }
-}
-@media (max-width: 800px) {
-  .header-main {
-    grid-template-columns: 1fr auto;
-    gap: 20px;
-    padding: 23px 0 18px;
-  }
-  .header-search {
-    grid-row: 2;
-    grid-column: 1/-1;
-  }
-  .user-nav {
-    padding: 0;
-  }
-  .header-top-inner,
-  .header-main,
-  .header-navigation {
-    margin-left: 25px;
-    margin-right: 25px;
-  }
-  .header-top-inner > span:last-child {
-    display: none;
-  }
-  .header-navigation > nav {
-    gap: 26px;
-  }
-  .header-publish {
-    font-size: 10px;
-  }
-}
-@media (max-width: 520px) {
-  .header-top-inner,
-  .header-main,
-  .header-navigation {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-  .header-main {
-    gap: 18px;
-  }
-  .brand strong {
-    font-size: 22px;
-  }
-  .brand-mark {
-    width: 35px;
-    height: 40px;
-  }
-  .brand small {
-    font-size: 7px;
-  }
-  .avatar-placeholder {
-    display: none;
-  }
-  .user-nav {
-    gap: 17px;
-  }
-  .header-navigation {
-    height: 43px;
-    gap: 20px;
-  }
-  .header-navigation > nav {
-    gap: 24px;
-    overflow: auto;
-    scrollbar-width: none;
-    white-space: nowrap;
-  }
-  .header-navigation > nav > a {
-    font-size: 10px;
-    flex-shrink: 0;
-  }
-  .header-publish {
-    display: none;
-  }
-  .search-capsule {
-    height: 43px;
-  }
-  .hot-searches {
-    gap: 14px;
-  }
-  .orders-entry {
-    font-size: 9px;
-  }
-}
+.market-header { background: var(--ground); }
+.header-main, .header-navigation { width: min(var(--content-width), calc(100% - var(--gutter) * 2)); margin-inline: auto; }
+.header-main { display: grid; grid-template-columns: 184px minmax(180px, 1fr) auto; gap: 32px; align-items: center; min-height: 96px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; width: fit-content; }
+.brand-mark { color: var(--accent); }
+.brand strong { font-size: 23px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.brand strong span { color: var(--accent); }
+.brand small { display: block; margin-top: 4px; font-size: 11px; color: var(--text-secondary); }
+.header-search { position: relative; min-width: 0; }
+.search-field { display: flex; align-items: center; gap: 12px; min-height: 48px; border: 1px solid var(--control-border); border-radius: var(--control-radius); padding: 4px 4px 4px 16px; background: var(--surface); color: var(--text-secondary); transition: border-color 160ms; }
+.search-field:focus-within { border-color: var(--accent); outline: 1px solid var(--accent); }
+.search-field input { width: 100%; min-width: 0; border: 0; outline: none; background: none; color: var(--text); height: 36px; font-size: 14px; }
+.search-field input::placeholder { color: var(--text-secondary); }
+.search-field kbd { flex-shrink: 0; font: inherit; font-size: 11px; color: var(--text-secondary); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+.search-field > button { flex-shrink: 0; min-height: 38px; padding: 0 20px; font-size: 14px; border-radius: 5px; background: var(--active); color: var(--text); font-weight: 550; }
+.search-field > button:hover { background: #dce7df; }
+.user-nav { display: flex; align-items: center; gap: 20px; white-space: nowrap; }
+.account-entry { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+.account-entry a, .account-entry button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; }
+.account-entry > span { color: var(--text-secondary); }
+.signed-in > span { max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
+.signed-in button { font-size: 12px; color: var(--text-secondary); }
+.orders-entry { display: flex; align-items: center; gap: 6px; font-size: 13px; min-height: 44px; }
+.header-publish { display: flex; gap: 7px; align-items: center; min-height: 44px; padding: 0 16px; border-radius: var(--control-radius); background: var(--primary); color: white; font-size: 13px; font-weight: 550; }
+.header-publish:hover { background: var(--accent); color: white; }
+.header-navigation { display: flex; justify-content: space-between; gap: 24px; align-items: center; min-height: 44px; padding-bottom: 8px; }
+.header-navigation > nav { display: flex; gap: 28px; }
+.header-navigation nav a { display: inline-flex; align-items: center; min-height: 40px; font-size: 13px; color: var(--text-secondary); position: relative; }
+.header-navigation nav a.current { color: var(--text); font-weight: 650; }
+.header-navigation nav a.current::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+.hot-searches { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-secondary); }
+.hot-searches button { padding: 0; min-height: 36px; }
+.hot-searches button:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.search-suggestions { position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 50; background: var(--surface); border-radius: 12px; box-shadow: 0 12px 36px #182c1f24; padding: 16px; }
+.suggestion-heading { display: flex; align-items: center; gap: 16px; }
+.suggestion-heading strong { margin-right: auto; font-size: 14px; }
+.suggestion-heading button { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; color: var(--text-secondary); font-size: 13px; }
+.history-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.history-tags button { min-height: 44px; max-width: 100%; overflow-wrap: anywhere; text-align: left; padding: 8px 12px; border-radius: 6px; background: var(--raised); }
+.search-suggestions p, .search-suggestions small { font-size: 12px; color: var(--text-secondary); }
+.history-undo button { min-height: 44px; text-decoration: underline; }
+@media (max-width: 1100px) { .header-main { grid-template-columns: 172px minmax(180px, 1fr) auto; gap: 20px; } .user-nav { gap: 14px; } .orders-entry { display: none; } .hot-searches { gap: 12px; } .search-field kbd { display: none; } }
+@media (max-width: 800px) { .header-main { grid-template-columns: 1fr auto; gap: 0 16px; padding-top: 12px; padding-bottom: 16px; } .brand { min-height: 48px; } .brand small { display: none; } .header-search { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; } .user-nav { gap: 16px; } .header-navigation { display: none; } .search-field > button { min-height: 40px; } }
+@media (max-width: 400px) { .brand { gap: 6px; } .brand strong { font-size: 20px; } .brand-mark { width: 25px; } .user-nav { gap: 12px; } .header-publish { padding-inline: 10px; } .header-publish svg { display: none; } .account-entry { gap: 5px; } }
 </style>

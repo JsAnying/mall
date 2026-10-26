@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-25T14:33:34.385Z",
+  "title": "Design System: 拾光闲置",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "绿灰地面"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "白色纸面"
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "雾白面"
+      },
+      "active": {
+        "role": "neutral",
+        "displayName": "灰绿选中面"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "墨绿正文"
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "苔灰副文"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "浅灰绿线"
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "灰绿控件线"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "松叶绿"
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "浅绿提示面"
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "深林绿"
+      },
+      "danger": {
+        "role": "error",
+        "displayName": "暗红"
+      },
+      "danger-soft": {
+        "role": "error",
+        "displayName": "浅红面"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "页面标题",
+        "purpose": "首页标题；窄屏为24px。"
+      },
+      "title": {
+        "displayName": "区块标题",
+        "purpose": "商品区标题；窄屏首页为17px。"
+      },
+      "body": {
+        "displayName": "中文正文",
+        "purpose": "正文和输入，使用同一系统字体栈。"
+      },
+      "product-title": {
+        "displayName": "商品标题",
+        "purpose": "两行商品标题。"
+      },
+      "label": {
+        "displayName": "辅助标签",
+        "purpose": "导航、地点等；不是所有控件的统一字号。"
+      },
+      "price": {
+        "displayName": "商品价格",
+        "purpose": "等宽数字，450px以下为22px。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "search-suggestions",
+        "value": "0 12px 36px #182c1f24",
+        "purpose": "搜索建议浮层。"
+      },
+      {
+        "name": "category-flyout",
+        "value": "0 12px 40px #182c1f24",
+        "purpose": "分类浮层。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "商品照片300ms缩放缓动。"
+      },
+      {
+        "name": "product-image",
+        "value": "transform 300ms var(--ease)",
+        "purpose": "悬停放大至1.035。"
+      },
+      {
+        "name": "image-action",
+        "value": "opacity 160ms",
+        "purpose": "悬停或聚焦显示图片内箭头。"
+      },
+      {
+        "name": "search-border",
+        "value": "border-color 160ms",
+        "purpose": "搜索边框状态。"
+      },
+      {
+        "name": "category-background",
+        "value": "background 150ms",
+        "purpose": "分类底色状态。"
+      },
+      {
+        "name": "image-loading",
+        "value": "image-loading 1.4s infinite",
+        "purpose": "等待图片加载时在50%关键帧将透明度设为0.5；减少动态效果偏好关闭动画。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "goods-three-columns",
+        "value": "1200px"
+      },
+      {
+        "name": "compact-gutter-sidebar",
+        "value": "1100px"
+      },
+      {
+        "name": "detail-compact-padding",
+        "value": "1000px"
+      },
+      {
+        "name": "workspace-single-column",
+        "value": "900px"
+      },
+      {
+        "name": "horizontal-categories-search-second-row",
+        "value": "800px"
+      },
+      {
+        "name": "detail-single-column",
+        "value": "700px"
+      },
+      {
+        "name": "account-single-column",
+        "value": "650px"
+      },
+      {
+        "name": "goods-two-columns-mobile-gutter",
+        "value": "600px"
+      },
+      {
+        "name": "goods-compact-price-category-groups",
+        "value": "450px"
+      },
+      {
+        "name": "compact-brand",
+        "value": "400px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "主要动作",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "首页空状态等主要动作，复用主要链接外观。",
+      "html": "<button class=\"ds-primary\">清除条件，查看全部</button>",
+      "css": ".ds-primary { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 44px; padding: 10px 20px; border: 0; border-radius: var(--control-radius, 8px); color: #fff; background: var(--primary, #253d30); font: 550 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; cursor: pointer; } .ds-primary:hover { background: var(--accent, #275c45); color: #fff; } .ds-primary:focus-visible { outline: 2px solid var(--accent, #275c45); outline-offset: 4px; }"
+    },
+    {
+      "name": "文字链接",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "辅助动作，悬停通过下划线补充颜色。",
+      "html": "<a class=\"ds-text\" href=\"#market\">继续浏览商品</a>",
+      "css": ".ds-text { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 400 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; color: var(--accent, #275c45); text-decoration: none; } .ds-text:hover { text-decoration: underline; text-underline-offset: 4px; } .ds-text:focus-visible { outline: 2px solid var(--accent, #275c45); outline-offset: 4px; }"
+    },
+    {
+      "name": "页头搜索",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "搜索输入与轻量提交按钮；预览展示样式，实际搜索由 Vue 和路由实现。",
+      "html": "<form class=\"ds-search\" role=\"search\" onsubmit=\"return false\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-5-5 M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0\"/></svg><input aria-label=\"搜索闲置商品\" type=\"search\" placeholder=\"搜一搜，找到你的下一件喜欢\"/><button type=\"submit\">搜索</button></form>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 12px; min-height: 48px; border: 1px solid var(--control-border, #b8c3bc); border-radius: var(--control-radius, 8px); padding: 4px 4px 4px 16px; background: var(--surface, #ffffff); color: var(--text-secondary, #5d6861); font: 400 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; transition: border-color 160ms; } .ds-search:focus-within { border-color: var(--accent, #275c45); outline: 1px solid var(--accent, #275c45); } .ds-search svg { flex-shrink: 0; } .ds-search input { width: 100%; min-width: 0; height: 36px; border: 0; outline: none; background: none; color: var(--text, #202923); font: inherit; caret-color: var(--accent, #275c45); } .ds-search input::placeholder { color: var(--text-secondary, #5d6861); } .ds-search button { flex-shrink: 0; min-height: 38px; padding: 0 20px; border: 0; border-radius: 5px; background: var(--active, #e8eeeb); color: var(--text, #202923); font: 550 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; cursor: pointer; } .ds-search button:hover { background: #dce7df; } .ds-search button:focus-visible { outline: 2px solid var(--accent, #275c45); outline-offset: 4px; } @media (prefers-reduced-motion: reduce) { .ds-search { transition: none; } }"
+    },
+    {
+      "name": "当前导航",
+      "kind": "nav",
+      "refersTo": "navigation-current",
+      "description": "页头导航以正文色和绿色下划线表示当前页。",
+      "html": "<nav class=\"ds-nav\" aria-label=\"集市导航\"><a class=\"ds-current\" href=\"#market\" aria-current=\"page\">发现好物</a><a href=\"#digital\">手机数码</a><a href=\"#home\">家居生活</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 28px; font: 400 13px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; } .ds-nav a { display: inline-flex; align-items: center; min-height: 40px; position: relative; color: var(--text-secondary, #5d6861); text-decoration: none; } .ds-nav a.ds-current { color: var(--text, #202923); font-weight: 650; } .ds-current::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent, #275c45); } .ds-nav a:focus-visible { outline: 2px solid var(--accent, #275c45); outline-offset: 4px; }"
+    },
+    {
+      "name": "已应用筛选",
+      "kind": "chip",
+      "refersTo": "chip-filter",
+      "description": "带移除名称与图标的筛选条件；路由与撤销逻辑保留在产品中。",
+      "html": "<button class=\"ds-filter\" aria-label=\"移除关键词 相机\">相机<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 6 12 12 M6 18 18 6\"/></svg></button>",
+      "css": ".ds-filter { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 6px; background: var(--active, #e8eeeb); color: var(--text, #202923); font: 400 12px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; overflow-wrap: anywhere; text-align: left; cursor: pointer; } .ds-filter:focus-visible { outline: 2px solid var(--accent, #275c45); outline-offset: 4px; } @media (max-width: 800px) { .ds-filter { min-height: 44px; } }"
+    },
+    {
+      "name": "工作区白面",
+      "kind": "card",
+      "refersTo": "workspace-card",
+      "description": "发布及订单工作区的平面容器。",
+      "html": "<section class=\"ds-workspace\"><h1>发布闲置</h1><p>整理好物信息，继续准备你的发布草稿。</p></section>",
+      "css": ".ds-workspace { min-width: 0; padding: 32px; background: var(--surface, #ffffff); color: var(--text, #202923); border: 1px solid var(--line, #e3e8e5); border-radius: var(--radius, 16px); font: 400 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; } .ds-workspace h1 { font-size: 28px; line-height: 1.4; letter-spacing: -0.02em; margin: 0 0 16px; } .ds-workspace p { color: var(--text-secondary, #5d6861); } @media (max-width: 600px) { .ds-workspace { padding: 20px; } .ds-workspace h1 { font-size: 24px; } }"
+    },
+    {
+      "name": "服务可用性说明",
+      "kind": "custom",
+      "refersTo": "availability-note",
+      "description": "用可读文字说明示例与暂未开放的交易服务。",
+      "html": "<div class=\"ds-availability\"><strong>商品展示示例</strong><p>交易和联系卖家暂未开放，此页不会创建订单或收取费用。</p></div>",
+      "css": ".ds-availability { padding: 16px; border-radius: var(--control-radius, 8px); background: var(--raised, #f6f8f7); color: var(--text, #202923); font: 400 14px/1.6 \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", sans-serif; } .ds-availability p { margin: 6px 0 0; color: var(--text-secondary, #5d6861); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "绿灰纸框中的白色集市",
+    "overview": "浅绿灰地面包住白色内容面，深绿承载价格、链接和当前操作。中文系统字体、细边线与真实商品素材构成安静、清楚、方便比较的界面；主内容区有明确边界，商品卡本身保持轻量。\n\n保留“拾光闲置”名称、既有 SVG 标志及本地素材。示例商品、未开放服务、请求失败等信息使用可读的正文与状态面表达。此文档从已实现代码提取；首页的 framed-sheet 方向和 seed 1103829787 记录在 `.impeccable/surfaces/storefront.md`，不约束所有未来页面必须采用首页构图。",
+    "keyCharacteristics": [
+      "浅绿灰背景与白面分层。",
+      "中文系统字体、清晰的价格和商品信息层级。",
+      "大内容面、轻商品卡、细边线和适度圆角。",
+      "源顺序网格与可见的键盘焦点。",
+      "既有图片、明确的缺图回退和服务状态。"
+    ],
+    "rules": [
+      {
+        "name": "The Role Color Rule",
+        "body": "价格、主要操作、当前状态沿用现有深绿分工；错误信息使用错误色，并同时提供文字说明。",
+        "section": "colors"
+      },
+      {
+        "name": "The Shared Chinese Type Rule",
+        "body": "沿用同一中文字体栈和语义层级；价格保持 `tabular-nums`，不新增仅用于装饰的展示字体。",
+        "section": "typography"
+      },
+      {
+        "name": "The Source Order Rule",
+        "body": "商品的视觉、DOM 与键盘浏览顺序保持一致；响应式只改变网格列数。",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "主内容与商品卡保持平面；已有浮层投影用于表达菜单与页面的覆盖关系。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** 复用 `src/assets/main.css` 的颜色变量和中文字体栈，让标题、表单和商品保持一致。",
+      "**Do** 保持商品源顺序、可见焦点和窄屏可操作的分类入口。",
+      "**Do** 在商品图片旁保留价格、成色和地点，并清楚标记示例与未开放服务。",
+      "**Do** 保留图片失败回退、撤销提示以及减少动态效果偏好。"
+    ],
+    "donts": [
+      "**Don't** 将首页构图、framed-sheet 名称或随机种子变成所有未来页面的唯一版式。",
+      "**Don't** 为静态商品卡添加菜单式阴影，或把插画内部投影当作界面投影令牌。",
+      "**Don't** 将当前局部 11–12px 辅助文字当作未来正文和交互标签的推荐字号。",
+      "**Don't** 依靠颜色独自传达错误、当前筛选或服务是否可用。"
+    ]
+  }
+}

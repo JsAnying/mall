@@ -39,10 +39,10 @@ request.interceptors.request.use((config) => {
 request.interceptors.response.use(
   (response) => {
     const body = response.data;
-    // 约定业务包裹格式 { code: 0 或 200, message, data }，也兼容普通 JSON。
+    // 统一返回体为 { code, msg, data }，成功后直接交给页面使用 data。
     if (body && typeof body === "object" && Object.hasOwn(body, "code")) {
       if (![0, 200].includes(Number(body.code))) {
-        const error = new Error(body.message || "操作失败");
+        const error = new Error(body.msg || "操作失败");
         error.status = Number(body.code);
         error.response = response;
         return reportError(error, response.config);
@@ -62,7 +62,7 @@ request.interceptors.response.use(
       500: "服务器异常，请稍后重试",
     };
     error.message =
-      error.response?.data?.message ||
+      error.response?.data?.msg ||
       (error.code === "ECONNABORTED" ? "请求超时，请稍后重试" : null) ||
       messages[error.status] ||
       (error.response

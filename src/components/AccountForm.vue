@@ -49,7 +49,7 @@ const rules = computed(() => ({
       : []),
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: ["blur", "change"] },
+    { required: true, whitespace: true, message: "请输入非空白密码", trigger: ["blur", "change"] },
     ...(props.register
       ? [
           {
@@ -92,6 +92,7 @@ watch(
 async function submit() {
   if (loading.value) return;
   error.value = "";
+  form.username = form.username.trim();
   if (!(await formRef.value.validate().catch(() => false))) return;
   formRef.value.clearValidate();
   loading.value = true;
@@ -104,7 +105,7 @@ async function submit() {
     };
     if (props.register) {
       await registerApi(credentials, { signal: controller.signal });
-      ElMessage.success("注册成功，请使用刚才的账号登录");
+      ElMessage.success("注册成功，账号已创建；登录服务暂未开放");
       await router.replace({
         path: "/login",
         query: route.query.redirect ? { redirect: destination.value } : {},
@@ -128,7 +129,6 @@ async function submit() {
 <template>
   <div class="account-layout">
     <aside class="account-intro">
-      <span class="eyebrow">拾光闲置 · 账号</span>
       <h1>
         {{ register ? "让好物，继续被喜欢。" : "欢迎回来，继续你的发现。" }}
       </h1>
@@ -152,7 +152,7 @@ async function submit() {
       </nav>
       <h2>{{ register ? "创建你的账号" : "登录账号" }}</h2>
       <p class="supporting-text">
-        {{ register ? "填写账号信息，注册后再登录。" : purpose }}
+        {{ register ? "创建账号，让每一份喜欢有新的开始。" : purpose }}
       </p>
       <el-form
         ref="formRef"
@@ -167,9 +167,10 @@ async function submit() {
             autocomplete="username"
             :maxlength="register ? 32 : undefined"
             placeholder="请输入用户名"
+            :aria-describedby="register ? 'username-hint' : undefined"
             :disabled="loading"
         /></el-form-item>
-        <p v-if="register" class="field-hint">
+        <p v-if="register" id="username-hint" class="field-hint">
           3–32 位字母、数字或下划线，例如 xiaolin_01。
         </p>
         <el-form-item label="密码" prop="password"
@@ -180,10 +181,11 @@ async function submit() {
             :autocomplete="register ? 'new-password' : 'current-password'"
             :maxlength="register ? 64 : undefined"
             placeholder="请输入密码"
+            :aria-describedby="register ? 'password-hint' : undefined"
             :disabled="loading"
         /></el-form-item>
-        <p v-if="register" class="field-hint">
-          6–64 位；可点击眼睛图标核对输入。请勿使用其他网站的密码。
+        <p v-if="register" id="password-hint" class="field-hint">
+          6–64 位非空白密码，UTF-8 最多 72 字节；首尾空格会保留。
         </p>
         <el-form-item v-if="register" label="确认密码" prop="confirmation"
           ><el-input
@@ -226,7 +228,7 @@ async function submit() {
               ? "正在连接账号服务，请稍候。"
               : stopped
                 ? "已停止等待，输入仍保留。注册请求可能已被处理，如账号已存在可尝试登录。"
-                : "账号服务需开放后才能完成登录或注册。"
+                : register ? "注册功能已开放；登录服务暂未开放。" : "登录服务暂未开放，你仍可以浏览商品。"
           }}
         </p>
       </el-form>
@@ -237,114 +239,30 @@ async function submit() {
   </div>
 </template>
 <style scoped>
-.account-layout {
-  max-width: 960px;
-  margin: 42px auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--surface);
-}
-.account-intro {
-  background: #eaece1;
-  padding: 38px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.account-intro h1 {
-  font-size: 30px;
-  line-height: 1.5;
-  margin: 0;
-}
-.account-intro p {
-  line-height: 1.8;
-  color: var(--text-secondary);
-  margin: 0;
-}
-.account-intro img {
-  width: 100%;
-  max-height: 220px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-.account-intro a {
-  margin-top: auto;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-}
-.account-panel {
-  padding: 36px;
-}
-.account-tabs {
-  display: flex;
-  gap: 26px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 28px;
-}
-.account-tabs a {
-  padding: 12px 0;
-  min-height: 44px;
-}
-.account-tabs .active {
-  color: var(--accent);
-  border-bottom: 2px solid var(--accent);
-  font-weight: 600;
-}
-.account-panel h2 {
-  font-size: 24px;
-  margin: 0 0 8px;
-}
-.supporting-text {
-  margin: 0 0 26px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-.field-hint {
-  font-size: 13px;
-  line-height: 1.6;
-  margin: -6px 0 18px;
-  color: var(--text-secondary);
-}
-.secondary-exit {
-  display: block;
-  text-align: center;
-  min-height: 44px;
-  padding: 12px;
-  font-size: 14px;
-}
-.operation-status {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-.error-panel {
-  margin-bottom: 20px;
-}
-@media (max-width: 700px) {
-  .account-layout {
-    grid-template-columns: 1fr;
-    margin: 0 auto;
-  }
-  .account-intro {
-    padding: 22px;
-  }
-  .account-intro img,
-  .account-intro p {
-    display: none;
-  }
-  .account-intro h1 {
-    font-size: 24px;
-  }
-  .account-panel {
-    padding: 24px;
-  }
-  .account-intro a {
-    margin: 0;
-  }
+.account-layout { max-width: 1040px; margin: 32px auto; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.account-intro { padding: 40px; display: flex; flex-direction: column; background: var(--active); }
+.account-intro h1 { font-size: 30px; line-height: 1.5; font-weight: 600; margin: 0 0 16px; }
+.account-intro p { margin: 0 0 28px; color: var(--text-secondary); font-size: 14px; line-height: 1.9; }
+.account-intro img { width: 100%; aspect-ratio: 1.2; object-fit: cover; border-radius: 12px; }
+.account-intro > a { display: flex; align-items: center; min-height: 44px; margin-top: 24px; color: var(--text-secondary); font-size: 13px; }
+.account-panel { min-width: 0; padding: 36px 40px; }
+.account-tabs { display: flex; gap: 28px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+.account-tabs a { display: flex; align-items: center; min-height: 44px; padding-block: 8px; font-size: 14px; color: var(--text-secondary); }
+.account-tabs .active { color: var(--text); border-bottom: 2px solid var(--accent); font-weight: 600; }
+.account-panel h2 { font-size: 24px; font-weight: 600; margin: 0 0 8px; }
+.supporting-text { font-size: 14px; margin: 0 0 24px; }
+.field-hint { margin: -10px 0 20px; font-size: 12px; line-height: 1.7; }
+.secondary-exit { display: flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
+.operation-status { margin-top: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+.error-panel { margin-bottom: 20px; }
+.el-button + .el-button.full-width { margin: 12px 0 0; }
+@media (max-width: 800px) { .account-layout { margin: 16px auto; } .account-intro, .account-panel { padding: 28px; } .account-intro h1 { font-size: 26px; } }
+@media (max-width: 650px) {
+  .account-layout { grid-template-columns: 1fr; margin: 0 auto; }
+  .account-intro { padding: 24px; background: var(--raised); }
+  .account-intro h1 { font-size: 22px; margin: 0; }
+  .account-intro p, .account-intro img, .account-intro > a { display: none; }
+  .account-panel { padding: 20px 24px 24px; }
+  .account-tabs { margin-bottom: 24px; }
 }
 </style>

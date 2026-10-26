@@ -35,7 +35,7 @@ describe('统一请求封装', () => {
     expect(adapter.mock.calls[0][0].headers.has('Authorization')).toBe(false)
   })
   it('业务失败会提示并 reject，不会当作成功', async () => {
-    await expect(request.get('/goods', { adapter: responseAdapter({ code: 400, message: '参数错误' }) })).rejects.toThrow('参数错误')
+    await expect(request.get('/goods', { adapter: responseAdapter({ code: 400, msg: '参数错误', data: null }) })).rejects.toThrow('参数错误')
     expect(ElMessage.error).toHaveBeenCalledOnce()
   })
   it('并发 HTTP 401 只调用一次失效处理', async () => {
@@ -61,10 +61,20 @@ describe('统一请求封装', () => {
     const handler = vi.fn()
     setUnauthorizedHandler(handler)
     await expect(request.post('/auth/login', {}, {
-      adapter: failureAdapter(401, { message: '密码错误' }), authFailureRedirect: false,
+      adapter: failureAdapter(401, { code: 401, msg: '密码错误', data: null }), authFailureRedirect: false,
     })).rejects.toThrow('密码错误')
     expect(handler).not.toHaveBeenCalled()
     expect(ElMessage.error).toHaveBeenCalledWith('密码错误')
+  })
+  it('注册冲突读取 msg，并交给表单显示错误', async () => {
+    const body = { code: 409, msg: '用户名已存在，请前往登录或更换用户名', data: null }
+    const error = await request.post('/auth/register', {}, {
+      adapter: failureAdapter(409, body), inlineError: true, authFailureRedirect: false,
+    }).catch((failure) => failure)
+    expect(error).toBeInstanceOf(Error)
+    expect(error.message).toBe(body.msg)
+    expect(error.status).toBe(409)
+    expect(ElMessage.error).not.toHaveBeenCalled()
   })
   it('超时提示与取消请求分别处理', async () => {
     const adapter = async (config) => { throw new axios.AxiosError('timeout', 'ECONNABORTED', config) }

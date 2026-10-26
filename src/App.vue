@@ -8,6 +8,7 @@ import HelpPanel from "@/components/HelpPanel.vue";
   <AppHeader />
   <main id="main-content" class="page" tabindex="-1"><RouterView /></main>
   <footer class="app-support">
-    <span>示例浏览 · 交易服务尚未开放</span><HelpPanel />
+    <div class="footer-brand"><strong>拾光闲置</strong><span>好物有下一站，生活有新可能。</span></div>
+    <span>商品与价格为展示示例 · 交易暂未开放</span><HelpPanel />
   </footer>
 </template>

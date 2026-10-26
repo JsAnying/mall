@@ -54,7 +54,7 @@ watch(source, () => {
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: #eeeee6;
+  background: var(--raised);
 }
 .product-frame > svg {
   width: 100%;
@@ -64,8 +64,7 @@ watch(source, () => {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg, #eeeee6 30%, #fafaf5 50%, #eeeee6 70%);
-  background-size: 200% 100%;
+  background: var(--active);
   animation: image-loading 1.4s infinite;
 }
 .image-fallback {
@@ -73,14 +72,12 @@ watch(source, () => {
   bottom: 8px;
   left: 8px;
   padding: 5px 8px;
-  background: #fffefa;
+  background: var(--surface);
   font-size: 12px;
   border-radius: 5px;
-  color: #4e5847;
+  color: var(--text-secondary);
 }
 @keyframes image-loading {
-  to {
-    background-position: -200% 0;
-  }
+  50% { opacity: 0.5; }
 }
 </style>

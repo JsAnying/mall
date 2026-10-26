@@ -6,204 +6,39 @@ defineProps({ goods: { type: Object, required: true } });
 <template>
   <RouterLink class="goods-card" :to="'/goods/' + goods.id">
     <div class="goods-image">
-      <ProductVisual
-        :kind="goods.kind"
-        :color="goods.color"
-        :accent="goods.accent"
-      /><span class="condition">{{ goods.condition }}</span
-      ><span class="image-badge"><MarketIcon name="arrow" :size="17" /></span>
+      <ProductVisual :kind="goods.kind" :color="goods.color" :accent="goods.accent" />
+      <span class="condition">{{ goods.condition }}</span>
+      <span class="image-action" aria-hidden="true"><MarketIcon name="arrow" :size="19" /></span>
     </div>
     <div class="goods-body">
-      <div class="card-eyebrow">
-        <span>个人闲置</span><span>{{ goods.location }}</span>
-      </div>
       <h3>{{ goods.title }}</h3>
-      <div class="price-row">
-        <span class="price"
-          ><small>¥</small>{{ goods.price.toLocaleString() }}</span
-        ><span class="wanted">{{ goods.wanted }} 人想要</span>
-      </div>
-      <div class="seller">
-        <span class="seller-avatar" :style="{ background: goods.avatar }">{{
-          goods.seller.slice(0, 1)
-        }}</span
-        ><span class="seller-name">{{ goods.seller }}</span
-        ><span class="seller-dot"></span>
-      </div>
+      <div class="price-row"><span class="price"><small>¥</small>{{ goods.price.toLocaleString() }}</span><span class="original-price">¥{{ goods.original.toLocaleString() }}</span></div>
+      <div class="goods-meta"><span>{{ goods.location }}</span><span>{{ goods.wanted }} 人想要</span></div>
+      <div class="seller"><span class="seller-avatar" :style="{ background: goods.avatar }">{{ goods.seller.slice(0, 1) }}</span><span class="seller-name">{{ goods.seller }}</span><span class="seller-type">个人闲置</span></div>
     </div>
   </RouterLink>
 </template>
 <style scoped>
-.goods-card {
-  display: block;
-  background: #fffefa;
-  overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  border: 1px solid #eeeee5;
-  color: #383e31;
-  transition:
-    transform 0.25s,
-    box-shadow 0.25s;
-}
-.goods-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 35px #3743290e;
-  color: #383e31;
-}
-.goods-image {
-  position: relative;
-  aspect-ratio: 1.07;
-  overflow: hidden;
-  background: #eeeae2;
-}
-.goods-image :deep(img),
-.goods-image :deep(svg) {
-  transition: transform 0.5s;
-}
-.goods-card:hover .goods-image :deep(img),
-.goods-card:hover .goods-image :deep(svg) {
-  transform: scale(1.045);
-}
-.condition {
-  position: absolute;
-  top: 13px;
-  left: 13px;
-  border-radius: 5px;
-  background: #fffefaeb;
-  font-size: 9px;
-  letter-spacing: 0.5px;
-  color: #777e6b;
-  padding: 5px 8px;
-}
-.image-badge {
-  position: absolute;
-  bottom: 13px;
-  right: 13px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #fffefade;
-  color: #869073;
-  opacity: 0;
-  transform: translateY(5px);
-  transition:
-    opacity 0.2s,
-    transform 0.2s;
-}
-.goods-card:hover .image-badge {
-  opacity: 1;
-  transform: none;
-}
-.goods-body {
-  padding: 15px 17px 16px;
-}
-.card-eyebrow {
-  display: flex;
-  justify-content: space-between;
-  font-size: 9px;
-  color: #a4a894;
-  margin-bottom: 8px;
-}
-h3 {
-  margin: 0 0 13px;
-  font-size: 12px;
-  line-height: 1.8;
-  font-weight: 450;
-  height: 43px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-.price-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 5px;
-}
-.price {
-  font-size: 22px;
-  color: var(--accent);
-  font-weight: 550;
-  letter-spacing: -0.4px;
-}
-.price small {
-  font-size: 11px;
-  margin-right: 3px;
-}
-.wanted {
-  font-size: 9px;
-  color: #b0b3a5;
-  white-space: nowrap;
-}
-.seller {
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  border-top: 1px solid #f0f0e8;
-  padding-top: 12px;
-  margin-top: 13px;
-  font-size: 10px;
-  color: #9a9f8e;
-}
-.seller-avatar {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 23px;
-  height: 23px;
-  font-size: 9px;
-  color: #827d6f;
-  border-radius: 50%;
-}
-.seller-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.seller-dot {
-  margin-left: auto;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #b2baa1;
-}
-@media (max-width: 520px) {
-  .goods-card {
-    margin-bottom: 15px;
-    border-radius: 10px;
-  }
-  .goods-image {
-    aspect-ratio: 1;
-  }
-  .goods-body {
-    padding: 12px;
-  }
-  .condition {
-    top: 9px;
-    left: 9px;
-    font-size: 8px;
-    padding: 4px 6px;
-  }
-  h3 {
-    font-size: 11px;
-    height: 40px;
-    margin-bottom: 10px;
-  }
-  .price {
-    font-size: 20px;
-  }
-  .wanted {
-    font-size: 8px;
-  }
-  .seller {
-    font-size: 9px;
-  }
-  .card-eyebrow {
-    font-size: 8px;
-  }
-}
+.goods-card { display: flex; flex-direction: column; min-width: 0; color: var(--text); }
+.goods-card:hover { color: var(--text); }
+.goods-image { position: relative; aspect-ratio: 1.1; overflow: hidden; border-radius: 12px; background: var(--raised); }
+.goods-image :deep(img) { transition: transform 300ms var(--ease); }
+.goods-card:hover .goods-image :deep(img) { transform: scale(1.035); }
+.condition { position: absolute; top: 12px; left: 12px; background: var(--surface); padding: 3px 8px; font-size: 12px; border-radius: 4px; color: var(--text); }
+.image-action { position: absolute; bottom: 12px; right: 12px; display: grid; place-items: center; width: 36px; height: 36px; background: var(--surface); color: var(--accent); border-radius: 50%; opacity: 0; transition: opacity 160ms; }
+.goods-card:hover .image-action, .goods-card:focus-visible .image-action { opacity: 1; }
+.goods-body { padding-top: 14px; }
+.goods-body h3 { font-size: 14px; line-height: 1.7; font-weight: 500; margin: 0 0 10px; min-height: 48px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.goods-card:hover h3 { color: var(--accent); }
+.price-row { display: flex; align-items: baseline; gap: 10px; min-height: 34px; font-variant-numeric: tabular-nums; }
+.price { font-size: 24px; line-height: 1.3; font-weight: 650; letter-spacing: -0.02em; color: var(--accent); }
+.price small { font-size: 14px; font-weight: 500; margin-right: 3px; }
+.original-price { font-size: 12px; color: var(--text-secondary); text-decoration: line-through; }
+.goods-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: 13px; color: var(--text-secondary); }
+.seller { display: flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 13px; color: var(--text-secondary); }
+.seller-avatar { display: grid; place-items: center; flex-shrink: 0; width: 23px; height: 23px; border-radius: 50%; color: #3d4236; font-size: 11px; }
+.seller-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.seller-type { margin-left: auto; white-space: nowrap; font-size: 12px; }
+@media (max-width: 1100px) { .seller-type { display: none; } }
+@media (max-width: 450px) { .goods-body { padding-top: 10px; } .goods-body h3 { font-size: 14px; min-height: 48px; margin-bottom: 8px; } .condition { top: 8px; left: 8px; font-size: 12px; } .price { font-size: 22px; } .price-row { gap: 6px; flex-wrap: wrap; } .original-price { font-size: 12px; } .goods-meta { font-size: 12px; gap: 4px; } .seller { margin-top: 10px; font-size: 12px; } }
 </style>
