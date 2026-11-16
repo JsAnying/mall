@@ -1,3 +1,5 @@
+export const DEMO_FAVORITES_KEY = "market_demo_favorites";
+
 // 浏览器存储不可用时，交互仍可继续；写入失败必须向调用方返回结果。
 export function readPreference(key, fallback) {
   try {

@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import MarketIcon from "./MarketIcon.vue";
+import HelpPanel from "./HelpPanel.vue";
 const panel = ref("");
 const feedback = ref("");
 const submitted = ref(false);
@@ -57,32 +58,28 @@ function undoFeedback() {
     error.value = "无法撤销，请检查浏览器存储设置后重试。";
   }
 }
-function backToTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
 </script>
 <template>
   <aside class="floating-dock" aria-label="快捷操作">
     <RouterLink class="dock-publish" to="/publish"
-      ><span><MarketIcon name="plus" :size="28" /></span
-      ><b>发布闲置</b></RouterLink
+      ><span class="publish-icon"><MarketIcon name="plus" :size="22" /></span
+      ><b>发闲置</b></RouterLink
     >
     <button @click="openPanel('messages')">
-      <MarketIcon name="message" /><span>消息</span></button
-    ><button @click="openPanel('mobile')">
-      <MarketIcon name="phone" /><span>手机端</span></button
-    ><button @click="openPanel('feedback')">
-      <MarketIcon name="feedback" /><span>反馈</span></button
-    ><button class="dock-top" @click="backToTop">
-      <MarketIcon name="up" /><span>回到顶部</span>
+      <MarketIcon name="message" /><span>消息</span>
     </button>
+    <button @click="openPanel('feedback')">
+      <MarketIcon name="feedback" /><span>反馈</span>
+    </button>
+    <HelpPanel v-slot="{ open }">
+      <button @click="open"><MarketIcon name="support" /><span>客服</span></button>
+    </HelpPanel>
   </aside>
   <el-dialog
     :model-value="Boolean(panel)"
     :title="
       {
         messages: '消息中心',
-        mobile: '手机也能逛好物',
         feedback: '你的建议，我们在听',
       }[panel]
     "
@@ -93,13 +90,6 @@ function backToTop() {
       ><el-empty description="消息服务尚未开放" :image-size="90" />
       <p class="dialog-note">
         当前为离线展示，聊天消息将在后端接入后开放。
-      </p></template
-    >
-    <template v-if="panel === 'mobile'"
-      ><div class="mobile-symbol"><MarketIcon name="phone" :size="64" /></div>
-      <p>在手机浏览器打开本站地址，即可使用移动端布局。</p>
-      <p class="dialog-note">
-        当前没有独立 App。搜索、分类和商品详情均支持手机浏览。
       </p></template
     >
     <template v-if="panel === 'feedback'"
@@ -142,15 +132,14 @@ function backToTop() {
 </template>
 
 <style scoped>
-.floating-dock { grid-column: 2; display: flex; align-items: center; justify-content: flex-end; gap: 24px; padding: 8px 0; }
-.floating-dock > button, .dock-publish { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 4px; font-size: 12px; color: var(--text-secondary); }
-.floating-dock svg { width: 17px; height: 17px; }
-.floating-dock b { font-size: 12px; font-weight: 500; }
-.dock-publish > span { display: flex; }
+.floating-dock { position: fixed; z-index: 25; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 5px; border-radius: 999px; background: #fff; box-shadow: 0 6px 24px #172d2320; }
+.floating-dock > button, .dock-publish { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 44px; min-height: 44px; padding: 4px; font-size: 12px; color: var(--text-secondary); }
+.floating-dock > button svg { width: 18px; height: 18px; }
+.floating-dock b { font-size: 12px; font-weight: 650; }
+.publish-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; }
 .floating-dock > button:hover, .dock-publish:hover { color: var(--accent); }
 .dialog-note { font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
-.mobile-symbol { display: flex; justify-content: center; color: var(--accent); padding: 20px; }
 .feedback-label { display: block; margin-bottom: 12px; font-size: 14px; }
-@media (max-width: 800px) { .floating-dock { grid-column: 1; justify-content: space-between; gap: 8px; padding: 8px 4px; } }
-@media (max-width: 450px) { .floating-dock > button, .dock-publish { flex-direction: column; gap: 3px; font-size: 11px; min-width: 44px; } .floating-dock b { font-size: 11px; } }
+@media (max-width: 1430px) { .floating-dock { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: 16px; flex-direction: row; transform: none; padding: 4px 10px; } }
+@media (max-width: 600px) { .floating-dock { inset: auto 0 0; justify-content: space-around; border-radius: 16px 16px 0 0; padding: 4px 12px max(4px, env(safe-area-inset-bottom)); } }
 </style>

@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 const opened = ref(false);
+function openHelp() { opened.value = true; }
 const route = useRoute();
 const topic = computed(() =>
   route.path === "/publish"
@@ -17,16 +18,16 @@ const topics = {
     title: "找到适合你的闲置",
     steps: [
       "输入商品名或品牌，按 Enter 搜索。",
-      "选择分类，再按价格排序；点击筛选条件可以单独移除。",
+      "打开分类列表查看对应商品，列表页可按价格排序。",
       "进入详情查看成色、价格和所在城市，返回后继续浏览。",
     ],
   },
   account: {
     title: "登录与注册",
     steps: [
-      "新用户可以注册账号；当前登录服务尚未开放。",
+      "新用户先注册，再使用用户名和密码登录。",
       "用户名为 3–32 位字母、数字或下划线；密码为 6–64 位。",
-      "注册失败后内容仍保留，请核对信息后重试。注册成功后会进入登录页；登录服务开放前仍可返回首页浏览。",
+      "注册失败后内容仍保留，请核对信息后重试。登录后点击顶部用户名，可修改昵称和头像。",
     ],
   },
   publish: {
@@ -48,7 +49,9 @@ const topics = {
 };
 </script>
 <template>
-  <button class="help-trigger" @click="opened = true">帮助与使用说明</button>
+  <slot :open="openHelp">
+    <button class="help-trigger" @click="openHelp">帮助与使用说明</button>
+  </slot>
   <el-drawer v-model="opened" title="使用帮助" size="min(420px, 100vw)">
     <h2>{{ topics[topic].title }}</h2>
     <ol class="help-steps">
@@ -58,7 +61,7 @@ const topics = {
     <h3>常见问题</h3>
     <el-collapse>
       <el-collapse-item title="为什么无法交易或发布？" name="availability"
-        >当前商品为展示示例。交易、聊天、图片上传和正式发布尚未开放；保存草稿不会上架商品。</el-collapse-item
+        >当前商品为展示示例。交易、聊天、商品图片上传和正式发布尚未开放；保存草稿不会上架商品。个人头像可在个人中心上传。</el-collapse-item
       >
       <el-collapse-item title="草稿和搜索记录存在哪里？" name="storage"
         >仅保存在当前浏览器。清理浏览器数据或更换设备后可能丢失，请勿在草稿中填写敏感信息。</el-collapse-item

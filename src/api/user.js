@@ -14,3 +14,11 @@ export const registerApi = (data, { signal } = {}) =>
     inlineError: true,
     signal,
   });
+
+export const getProfileApi = () => request.get('/users/me', { inlineError: true });
+export const updateProfileApi = (data) => request.patch('/users/me', data, { inlineError: true });
+export const uploadAvatarApi = (file) => {
+  const data = new FormData();
+  data.append('file', file);
+  return request.post('/users/me/avatar', data, { inlineError: true });
+};

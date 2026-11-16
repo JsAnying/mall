@@ -1,6 +1,36 @@
 # 拾光闲置 · 本地 Spring Boot 建项目步骤
 
-> 2026-10-25：当前工程已按新要求迁移为 Java 17 + Spring Boot 3.5.16 + MyBatis-Plus 3.5.17，启动类为 `org.example.aispingboot.AiSpingbootApplication`，本轮仅注册接口。请优先阅读[当前运行说明](../../shiguang-server/market/README.md)和[每个文件的完整代码](../../shiguang-server/market/docs/refactor-complete-source.md)。当前注册使用独立 `user` 表，旧数据不会自动迁移。下方 Boot 4、JDK 21/25、原生 MyBatis/XML 和安全配置内容保留为历史参考，不要直接覆盖新工程配置。
+当前工程使用 Java 17、Spring Boot 3.5.16、MyBatis-Plus 3.5.17 和 Spring Security，启动类为 `com.zhf.mall.AiSpingbootApplication`。实现状态以[接口文档](backend-api.md)和源码为准。
+
+## 当前工程启动与首页联调
+
+1. 启动 MySQL，确认本机的 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD` 指向要使用的开发库。账号、头像和退出功能依赖 `user`、`user_avatar`、`revoked_token`。分类依赖 `categories`、`category_groups`、`category_types`，推荐依赖 `home_hot_searches`、`home_banners`。
+2. 新库可参照[当前后端 SQL 脚本](../../shiguang-server/market/sql/)中的用户、撤销、头像、分类脚本。热搜和 Banner 可从[旧版结构](sql/01-schema.sql)与[初始数据](sql/02-seed.sql)提取对应两张表的语句；已有开发库先核对表和数据。首页四个频道来自前端示例配置，无需初始化频道表。
+3. 分别在两个终端启动服务，按终端实际端口调整联调地址。
+
+```powershell
+Set-Location E:\shiguang-server\market
+mvn.cmd -version
+mvn.cmd spring-boot:run
+```
+
+```powershell
+Set-Location E:\shop
+npm.cmd run dev
+```
+
+通过 Vite 代理匿名检查首页读取的两个接口，后端直连可把端口换为 8080：
+
+```powershell
+$categories = Invoke-RestMethod 'http://127.0.0.1:5173/api/categories'
+$recommendations = Invoke-RestMethod 'http://127.0.0.1:5173/api/home/recommendations'
+$categories.data | ConvertTo-Json -Depth 8
+$recommendations.data | ConvertTo-Json -Depth 4
+```
+
+预期两个请求的 HTTP 状态和业务码均为 200。分类返回带 `groups/items` 的数组；推荐只返回 `hotSearches` 和 `banner`。浏览器中可验证首屏分类跳转、搜索框下方的热搜与 Banner。全宽商品流、频道卡内商品和分类页排序仍基于本地示例。后端已提供 `GET /api/goods`，前端待接入；已有开发库需先完成 [商品浏览量迁移](sql/README.md#商品浏览量迁移)。`/api/health` 尚未实现，当前可用上述两条请求检查代理与相应表的读取。
+
+> 下文为历史教程，使用 Boot 4、JDK 21/25 和原生 MyBatis/XML。当前工程的启动、依赖版本和接口状态以上文为准。
 
 更新：2026-10-16，配套接口契约 v1.1。第 4 节按你已有的 root 账号调整，密码通过本机输入或环境变量填写。完整业务契约见 [接口文档](backend-api.md)。本文以 IntelliJ IDEA 为例，提供项目创建与配置示例；最新实现进展见下一段。
 
@@ -375,7 +405,7 @@ public class DbConnectionCheck implements ApplicationRunner {
 
 完成连接验证后，执行 [完整建表脚本](sql/01-schema.sql)，再执行 [分类与首页初始数据](sql/02-seed.sql)。具体步骤见 [SQL 执行说明](sql/README.md)。先确认 shiguang_market_dev 是空库，再初始化一次。
 
-可以先创建完整表结构，业务接口仍按 users → 注册/登录 → 分类/商品 → 上传/订单逐步实现。Lombok POJO 和 Mapper 不会自动生成数据表。
+可以先创建完整表结构，业务接口按 `user` 账号表 → 注册/登录 → 分类/商品 → 上传/订单逐步实现。Lombok POJO 和 Mapper 不会自动生成数据表。
 
 ### 4.8 常见问题按顺序排查
 
@@ -413,7 +443,7 @@ src/main/java/com/shiguang/market/
 
 | 表 | 核心要求 |
 | --- | --- |
-| users | username 唯一、password_hash、nickname、avatar_file_id |
+| `user` | username 唯一、password_hash、nickname、avatar_file_id |
 | categories / category_types | 分类与类型联合唯一 |
 | goods | seller_id、price DECIMAL(10,2)、status、version、deleted_at |
 | uploaded_files / goods_images | 上传归属、用途、路径、排序 |
@@ -439,7 +469,7 @@ WHERE id = ? AND seller_id = ? AND version = ?
 
 ### 5.1 MyBatis + Lombok 最小数据访问示例
 
-以下示例只演示 Mapper/XML 与 Lombok 构造注入，未实现登录接口。users 已包含在 01-schema.sql 中，执行完整脚本后不要再次创建同名表。
+以下示例只演示 Mapper/XML 与 Lombok 构造注入，未实现登录接口。`user` 已包含在 `01-schema.sql` 中。
 
 保存为 `user/entity/UserEntity.java`：
 
@@ -491,15 +521,15 @@ public interface UserMapper {
 <mapper namespace="com.shiguang.market.user.mapper.UserMapper">
     <select id="findById" resultType="com.shiguang.market.user.entity.UserEntity">
         SELECT id, username, password_hash, nickname, avatar_file_id, created_at, updated_at
-        FROM users WHERE id = #{id}
+        FROM `user` WHERE id = #{id}
     </select>
     <select id="findByUsername" resultType="com.shiguang.market.user.entity.UserEntity">
         SELECT id, username, password_hash, nickname, avatar_file_id, created_at, updated_at
-        FROM users WHERE username = #{username}
+        FROM `user` WHERE username = #{username}
     </select>
     <insert id="insert" parameterType="com.shiguang.market.user.entity.UserEntity"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO users (username, password_hash, nickname, avatar_file_id, created_at, updated_at)
+        INSERT INTO `user` (username, password_hash, nickname, avatar_file_id, created_at, updated_at)
         VALUES (#{username}, #{passwordHash}, #{nickname}, #{avatarFileId}, UTC_TIMESTAMP(), UTC_TIMESTAMP())
     </insert>
 </mapper>
@@ -752,7 +782,7 @@ Invoke-RestMethod 'http://localhost:8080/api/goods?keyword=camera&page=1&size=20
 | getter/setter/构造注入报错 | Lombok 依赖、annotationProcessorPaths、IDE 注解处理开关 |
 | Mapper Bean 找不到 | 接口加 @Mapper，或正确配置 @MapperScan；启动类根包覆盖业务 |
 | Invalid bound statement | XML 路径、namespace 与 Mapper 方法 id；检查 mapper-locations |
-| Table users doesn't exist | 按 sql/README.md 执行完整初始化；MyBatis 不会自动建表 |
+| Table `user` doesn't exist | 按当前后端 SQL 脚本创建账号表；MyBatis 不会自动建表 |
 | 数据库 Access denied | 用户、密码、连接主机；启动进程是否有 DB_PASSWORD |
 | 连接数据库失败 | MySQL 服务、3306、库名 |
 | 登录 POST 403 | 匿名路径、无状态 Bearer 配置与 CSRF |

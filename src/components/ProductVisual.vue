@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import ProductArt from "./ProductArt.vue";
 const props = defineProps({
   kind: { type: String, default: "camera" },
+  imageUrl: String,
   color: String,
   accent: String,
 });
@@ -15,7 +16,7 @@ const photos = {
   shoe: "/images/shoe.png",
   phone: "/images/phone.png",
 };
-const source = computed(() => photos[props.kind]);
+const source = computed(() => props.imageUrl || photos[props.kind]);
 const failed = ref(false);
 const loaded = ref(false);
 watch(source, () => {

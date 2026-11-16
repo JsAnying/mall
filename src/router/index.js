@@ -8,11 +8,13 @@ const router = createRouter({
   scrollBehavior,
   routes: [
     { path: '/', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { title: '闲置集市' } },
+    { path: '/browse', name: 'browse', component: () => import('@/views/BrowseView.vue'), meta: { title: '浏览商品' } },
     { path: '/login', name: 'login', component: () => import('@/views/LoginView.vue'), meta: { title: '登录' } },
     { path: '/register', name: 'register', component: () => import('@/views/RegisterView.vue'), meta: { title: '注册' } },
     { path: '/goods/:id', name: 'goods-detail', props: true, component: () => import('@/views/GoodsDetailView.vue'), meta: { title: '商品详情' } },
     { path: '/publish', name: 'publish', component: () => import('@/views/PublishView.vue'), meta: { title: '发布闲置', requiresAuth: true } },
     { path: '/user/orders', name: 'orders', component: () => import('@/views/OrdersView.vue'), meta: { title: '我的订单', requiresAuth: true } },
+    { path: '/user/profile', name: 'profile', component: () => import('@/views/ProfileView.vue'), meta: { title: '个人中心', requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFoundView.vue'), meta: { title: '页面不存在' } },
   ],
 })

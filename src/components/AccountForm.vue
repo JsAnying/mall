@@ -28,7 +28,9 @@ const purpose = computed(() =>
     ? "登录后继续准备发布信息"
     : destination.value.startsWith("/user/orders")
       ? "登录后查看你的买入和卖出记录"
-      : "登录后管理你的闲置和订单",
+      : destination.value.startsWith("/goods/")
+        ? "登录后返回刚才浏览的商品"
+        : "登录后管理你的闲置和订单",
 );
 const rules = computed(() => ({
   username: [
@@ -100,12 +102,12 @@ async function submit() {
   controller = new AbortController();
   try {
     const credentials = {
-      username: form.username.trim(),
+      username: form.username,
       password: form.password,
     };
     if (props.register) {
       await registerApi(credentials, { signal: controller.signal });
-      ElMessage.success("注册成功，账号已创建；登录服务暂未开放");
+      ElMessage.success("注册成功，请登录");
       await router.replace({
         path: "/login",
         query: route.query.redirect ? { redirect: destination.value } : {},
@@ -228,7 +230,7 @@ async function submit() {
               ? "正在连接账号服务，请稍候。"
               : stopped
                 ? "已停止等待，输入仍保留。注册请求可能已被处理，如账号已存在可尝试登录。"
-                : register ? "注册功能已开放；登录服务暂未开放。" : "登录服务暂未开放，你仍可以浏览商品。"
+                : register ? "注册成功后，请使用新账号登录。" : "登录后可点击顶部用户名，查看和编辑个人资料。"
           }}
         </p>
       </el-form>

@@ -16,6 +16,6 @@ FROM information_schema.table_constraints
 WHERE constraint_schema = DATABASE()
 GROUP BY constraint_type;
 -- 新建后以下业务表为空；以后有真实数据时不要求保持 0。
-SELECT 'users' AS item, COUNT(*) AS row_count FROM users
+SELECT 'user' AS item, COUNT(*) AS row_count FROM `user`
 UNION ALL SELECT 'goods', COUNT(*) FROM goods
 UNION ALL SELECT 'orders', COUNT(*) FROM orders;

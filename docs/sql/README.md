@@ -1,6 +1,6 @@
 # 完整建表与初始数据
 
-> 2026-10-25：本文描述旧市场 15 表结构。当前 Java 17 / Boot 3 / MyBatis-Plus 注册工程改用 `user` 表，请使用 `E:/shiguang-server/market/sql/01-user-schema.sql`；旧账号的可选复制脚本为 `02-copy-legacy-users.sql`。不要为重构注册而重新运行整套旧建表脚本；旧 `users` 表及其外键未自动更名。
+> 2026-11-08：市场 15 表初始化模板已统一使用 `user`。开发库 `shiguang_market_dev` 已将 7 条外键迁到 `user` 并删除空的旧 `users` 表。当前后端运行需要的表见 [后端启动说明](../backend-setup.md)。
 
 适用当前接口契约 v1.1，数据库为 shiguang_market_dev，MySQL 8.4 / 9.x。文件按 01 → 02 → 03 顺序执行。脚本不创建数据库账号、不设置密码、不删除旧表，也不生成默认登录账号或虚构交易。
 
@@ -12,7 +12,7 @@
 
 ## 执行方法
 
-先按 [建项目教程第 4 节](../backend-setup.md)使用现有 root 账号创建或选择开发库。完整脚本用于空库；如果你已建过教程中的 users 演示表，先核对现状，使用新空库并替换三个脚本中的 USE 与 JDBC 库名，不要在已有表上反复运行初始化脚本。
+先按 [建项目教程第 4 节](../backend-setup.md)使用现有 root 账号创建或选择开发库。完整脚本用于空库。如果使用另一个空库，需同步替换三个脚本中的 USE 与 JDBC 库名。已有业务库升级使用独立迁移脚本。
 
 本机 MySQL 9.6 客户端需要启用本地命令，才能使用 SOURCE。在 PowerShell：
 
@@ -43,12 +43,12 @@ SOURCE E:/shop/docs/sql/03-verify.sql;
 
 | 表 | 用途 |
 | --- | --- |
-| users | 用户账号、密码哈希、昵称、头像引用 |
+| `user` | 用户账号、密码哈希、昵称、头像引用 |
 | uploaded_files | 上传图片的归属、用途、路径、尺寸与大小 |
 | categories | 一级分类 |
 | category_groups | 分类悬浮面板的分组 |
 | category_types | 具体类型，分类与类型联合主键 |
-| goods | 商品内容、价格、成色、状态、版本及软删除 |
+| goods | 商品内容、售价、成色、浏览量、状态、版本及软删除 |
 | goods_images | 图片顺序，最多 9 张；同时约束文件归属与 GOODS 用途 |
 | orders | 买卖记录、商品快照、状态及超时时间 |
 | order_idempotency | 同一用户与幂等 Key 去重 |
@@ -61,12 +61,36 @@ SOURCE E:/shop/docs/sql/03-verify.sql;
 
 当前不需要草稿、搜索历史表：它们保存在浏览器。聊天、支付、物流、退款等没有定义接口，本脚本不提前创建这些业务表。
 
+## 个人中心与商品操作增量
+
+接口契约 v1.6 的以下五张表由 [08-market-profile-and-actions.sql](../../../shiguang-server/market/sql/08-market-profile-and-actions.sql) 创建。先确保已有 `user`、`goods`、`orders`，再执行该增量脚本。脚本选择本机开发配置使用的 `shiguang_market_dev`，可重复执行。
+
+| 表 | 对应功能 | 约束和查询 |
+| --- | --- | --- |
+| `user_public_profiles` | 个人名片与卖家摘要 | 每个账号最多一行，存放允许公开的地区和最近活跃时间 |
+| `user_follows` | 粉丝数和关注数 | 按关注者与被关注者分别查询。每对用户只有一条同向关系，禁止关注自己 |
+| `order_reviews` | 信用及评价 | 同一订单的每位评价人最多提交一次。按被评价方、可见状态、创建时间和 ID 查询 |
+| `goods_favorites` | 收藏、取消收藏和收藏列表 | 每个账号对同一商品最多一条，按收藏时间与商品 ID 倒序查询 |
+| `cart_items` | 加入购物车 | 每个账号对同一商品最多一条，数量固定为一件 |
+
+昵称、头像和加入时间继续读取 `user`。宝贝及发布记录查询 `goods`，买入与卖出记录查询 `orders`。成交数取已完成订单，好评率可由可展示评价计算。信用徽章由后端按信用规则生成。当前 `goods` 暂无包邮字段，详情契约允许 `freeShipping` 返回 `null`。
+
+评价写入时由 Service 核对订单已完成、双方确为该订单参与者。加购时由 Service 检查在售状态与卖家身份。数据库约束负责引用完整性和去重。
+
+2026-11-08 已在 MySQL 9.6.0 的 `shiguang_market_dev` 执行。现有 17 张表的定义和行数核对一致，新增五张空表。隔离库复跑两次迁移，验证了关注与评价查询、收藏排序、联合主键、外键和 `CHECK` 约束。
+
+## 商品浏览量迁移
+
+已有库缺少 `goods.view_count` 时，执行一次 [10-goods-view-count.sql](../../../shiguang-server/market/sql/10-goods-view-count.sql)。该列为非空整数，默认 0，约束禁止负数。旧 `original_price`、`wanted_count` 作为历史数据保留，商品列表只读取当前售价及浏览量。
+
+新版 `01-schema.sql` 已包含 `view_count`，空库初始化后无需执行第 10 号迁移。第 9 号注释脚本面向迁移前的旧结构。
+
 ## MyBatis 与接口映射
 
 - 用户、商品、订单、反馈等数据库主键为 BIGINT，Java 用 Long，返回 API 时转成字符串。上传文件 ID 使用应用生成的 UUID/随机字符串；分类和类型使用现有稳定字符串。
 - goods.condition_code 对应 API condition；conditionLabel 由枚举生成。price/amount 使用 BigDecimal，不使用 double。
 - 封面读取 goods_images.sort_order=1 的文件 URL，商品详情的图片按 sort_order 升序。发布事务保证位置从 1 连续排列且至少一张，SQL 唯一位置约束限制最多 9 张。
-- users.avatar_file_id 外键只保证文件存在；Service 另外校验文件属于本人且 purpose=AVATAR。
+- 当前头像服务通过 `user.avatar_file_id` 引用 `user_avatar.id`，头像归属由 Service 校验。`user_avatar` 由后端的 `04-user-avatar.sql` 创建。
 - category_groups 按 sort_order 返回，category_types 按组与 sort_order 返回；不用依赖自增 ID 的自然顺序。
 - orders 的 goods_title、goods_cover_url、goods_condition_label、goods_price 是下单快照。JSON goods.id 来自 goods_id，amount 不能由客户端指定。快照图片由商品封面推导，Service 不能接受任意文件 ID。
 - seed 中首页图片引用前端已有 public/images 素材，用于本地联调；不是用户上传图片或真实在售商品。正式内容可换成 /api/media 地址。
@@ -90,6 +114,8 @@ orders.active_goods_id 为内部生成列，PENDING/CONFIRMED 时等于 goods_id
 数据库可以检查允许的状态值与部分时间字段，但合法状态迁移、卖家/买家权限、超时任务和价格变化仍必须由 Service 校验。检查 version 条件更新的行数，冲突返回 409。软删除商品不物理删除用户、订单和已被快照引用的图片。
 
 ## 验证范围
+
+2026-11-08 在独立 MySQL 9.6 空库重放更新后的三个脚本，确认初始化生成 15 张表和 7 条指向 `user.id` 的账号外键。
 
 脚本已在独立临时 MySQL 9.6 实例执行；全部表和种子数据创建成功，并验证了用户名大小写唯一、分类/类型组合、价格、图片归属/用途/数量、禁止自购、单商品进行中订单唯一、占用指针归属、订单幂等、取消后释放及快照文件留存约束。未对本机 3306 的用户开发库执行初始化。
 

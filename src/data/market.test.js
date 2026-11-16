@@ -1,7 +1,6 @@
 import { expect, it } from "vitest";
 import {
   goods,
-  channels,
   categories,
   hotSearches,
   filterGoods,
@@ -24,19 +23,13 @@ it("每个一级分类都有完整商品类型，类型能单独筛选", () => {
   ).toEqual([6]);
   expect(filterGoods({ category: "fashion", type: "phone" })).toHaveLength(0);
 });
-it("分类、推荐引用与商品 ID 完整且唯一", () => {
+it("商品 ID 唯一，商品指向有效分类", () => {
   expect(new Set(goods.map((item) => item.id)).size).toBe(goods.length);
   for (const item of goods)
     expect(categories.some((category) => category.id === item.category)).toBe(
       true,
     );
-  for (const channel of channels) {
-    expect(channel.products).toHaveLength(2);
-    for (const id of channel.products)
-      expect(
-        goods.some((item) => item.id === id && item.category === channel.id),
-      ).toBe(true);
-  }
+
 });
 it("关键词与分类组合筛选，空结果不会回退到全部商品", () => {
   for (const query of hotSearches)

@@ -7,18 +7,18 @@ SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 
 -- 1. 用户。注册时 password_hash 必须来自 BCryptPasswordEncoder。
-CREATE TABLE users (
+CREATE TABLE `user` (
     id BIGINT NOT NULL AUTO_INCREMENT,
     username VARCHAR(32) NOT NULL,
     password_hash VARCHAR(100) NOT NULL,
     nickname VARCHAR(32) NOT NULL,
     avatar_file_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
-    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    created_at DATETIME(3) NOT NULL,
+    updated_at DATETIME(3) NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT uk_users_username UNIQUE (username),
-    CONSTRAINT ck_users_username CHECK (REGEXP_LIKE(username, '^[A-Za-z0-9_]{3,32}$')),
-    CONSTRAINT ck_users_nickname CHECK (CHAR_LENGTH(TRIM(nickname)) BETWEEN 1 AND 32)
+    CONSTRAINT uk_user_username UNIQUE (username),
+    CONSTRAINT ck_user_username CHECK (REGEXP_LIKE(username, '^[A-Za-z0-9_]{3,32}$')),
+    CONSTRAINT ck_user_nickname CHECK (CHAR_LENGTH(TRIM(nickname)) BETWEEN 1 AND 32)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户账号与公开资料';
 
 -- 2. 上传文件。file ID 由应用生成 UUID/随机字符串；path 相对 upload-dir。
@@ -39,16 +39,14 @@ CREATE TABLE uploaded_files (
     UNIQUE KEY uk_files_owner_purpose (id, owner_id, purpose),
     KEY idx_files_owner_created (owner_id, created_at, id),
     KEY idx_files_created (created_at, id),
-    CONSTRAINT fk_files_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_files_owner_account FOREIGN KEY (owner_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT ck_files_purpose CHECK (purpose IN ('GOODS', 'AVATAR')),
     CONSTRAINT ck_files_mime CHECK (mime_type IN ('image/jpeg', 'image/png', 'image/webp')),
     CONSTRAINT ck_files_size CHECK (size_bytes BETWEEN 1 AND 5242880),
     CONSTRAINT ck_files_dimensions CHECK (width > 0 AND height > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='已验证的上传图片';
 
--- 用户和文件有相互引用，先建两个表再补头像外键；归属和 AVATAR 用途由 Service 校验。
-ALTER TABLE users ADD CONSTRAINT fk_users_avatar
-    FOREIGN KEY (avatar_file_id) REFERENCES uploaded_files (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+-- 当前头像服务使用 user_avatar，Service 校验头像归属。
 
 -- 3. 一级分类。
 CREATE TABLE categories (
@@ -100,11 +98,10 @@ CREATE TABLE goods (
     title VARCHAR(80) NOT NULL,
     description VARCHAR(2000) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
-    original_price DECIMAL(10,2) NULL,
     condition_code VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
     seller_type VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'PERSONAL',
     location VARCHAR(50) NOT NULL,
-    wanted_count INT NOT NULL DEFAULT 0,
+    view_count INT NOT NULL DEFAULT 0 COMMENT '商品累计浏览次数',
     status VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'ON_SALE',
     reserved_order_id BIGINT NULL,
     version INT NOT NULL DEFAULT 1,
@@ -121,16 +118,15 @@ CREATE TABLE goods (
     KEY idx_goods_price (status, deleted_at, price, id),
     KEY idx_goods_category_price (category_id, status, deleted_at, price, id),
     KEY idx_goods_seller (seller_id, deleted_at, created_at, id),
-    CONSTRAINT fk_goods_seller FOREIGN KEY (seller_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_goods_seller_account FOREIGN KEY (seller_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_goods_type FOREIGN KEY (category_id, type_id) REFERENCES category_types (category_id, id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT ck_goods_title CHECK (CHAR_LENGTH(TRIM(title)) BETWEEN 2 AND 80),
     CONSTRAINT ck_goods_description CHECK (CHAR_LENGTH(TRIM(description)) BETWEEN 10 AND 2000),
     CONSTRAINT ck_goods_price CHECK (price > 0 AND price <= 999999.99),
-    CONSTRAINT ck_goods_original CHECK (original_price IS NULL OR original_price >= price),
     CONSTRAINT ck_goods_condition CHECK (condition_code IN ('NEW', 'NEAR_NEW', 'LIKE_NEW', 'GOOD', 'USED')),
     CONSTRAINT ck_goods_seller_type CHECK (seller_type = 'PERSONAL'),
     CONSTRAINT ck_goods_location CHECK (CHAR_LENGTH(TRIM(location)) BETWEEN 1 AND 50),
-    CONSTRAINT ck_goods_count CHECK (wanted_count >= 0),
+    CONSTRAINT ck_goods_view_count CHECK (view_count >= 0),
     CONSTRAINT ck_goods_version CHECK (version >= 1),
     CONSTRAINT ck_goods_status CHECK (status IN ('ON_SALE', 'RESERVED', 'SOLD', 'OFF_SHELF')),
     CONSTRAINT ck_goods_reservation CHECK (reserved_order_id IS NULL OR status = 'RESERVED')
@@ -190,8 +186,8 @@ CREATE TABLE orders (
     KEY idx_orders_timeout (status, expires_at, id),
     KEY idx_orders_goods (goods_id, seller_id),
     CONSTRAINT fk_orders_goods_owner FOREIGN KEY (goods_id, seller_id) REFERENCES goods (id, seller_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT fk_orders_buyer FOREIGN KEY (buyer_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT fk_orders_seller FOREIGN KEY (seller_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_orders_buyer_account FOREIGN KEY (buyer_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_orders_seller_account FOREIGN KEY (seller_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_orders_cover FOREIGN KEY (goods_cover_file_id) REFERENCES uploaded_files (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT ck_orders_parties CHECK (buyer_id <> seller_id),
     CONSTRAINT ck_orders_status CHECK (status IN ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED')),
@@ -221,7 +217,7 @@ CREATE TABLE order_idempotency (
     UNIQUE KEY uk_idempotency_user_key (user_id, idempotency_key),
     UNIQUE KEY uk_idempotency_order (order_id),
     KEY idx_idempotency_expiry (expires_at, id),
-    CONSTRAINT fk_idempotency_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_idempotency_account FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_idempotency_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT ck_idempotency_expiry CHECK (expires_at >= DATE_ADD(created_at, INTERVAL 24 HOUR))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='订单创建请求去重，至少保留24小时';
@@ -235,7 +231,7 @@ CREATE TABLE revoked_tokens (
     PRIMARY KEY (token_jti),
     KEY idx_revoked_expiry (expires_at),
     KEY idx_revoked_user (user_id),
-    CONSTRAINT fk_revoked_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_revoked_account FOREIGN KEY (user_id) REFERENCES `user` (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='登出后的JWT撤销记录';
 
 -- 11. 在线反馈。本机建议不会自动同步到这个表。
@@ -248,7 +244,7 @@ CREATE TABLE feedback (
     PRIMARY KEY (id),
     KEY idx_feedback_user (user_id, created_at, id),
     KEY idx_feedback_created (created_at, id),
-    CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_feedback_account FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT ck_feedback_content CHECK (CHAR_LENGTH(TRIM(content)) BETWEEN 1 AND 500),
     CONSTRAINT ck_feedback_path CHECK (page_path IS NULL OR
         (LEFT(page_path, 1) = '/' AND LEFT(page_path, 2) <> '//'))

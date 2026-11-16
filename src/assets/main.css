@@ -4,7 +4,7 @@
   color-scheme: light;
   color: var(--text);
   background: var(--ground);
-  --ground: #f3f5f4;
+  --ground: #F5F6F8;
   --surface: #ffffff;
   --raised: #f6f8f7;
   --active: #e8eeeb;
@@ -22,7 +22,7 @@
   --control-radius: 8px;
   --gap: 24px;
   --content-width: 1280px;
-  --gutter: 32px;
+  --gutter: 24px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --el-color-primary: #275c45;
   --el-color-primary-light-3: #4e7d63;
@@ -65,6 +65,7 @@ svg { flex-shrink: 0; }
 .page, .app-support { width: min(var(--content-width), calc(100% - var(--gutter) * 2)); margin-inline: auto; }
 .page { margin-top: 24px; min-height: 50vh; }
 .page:focus { outline: none; }
+@media (max-width: 1430px) { body:has(.floating-dock) .app-support { margin-bottom: 78px; } }
 .muted, .supporting-text, .field-hint { color: var(--text-secondary); }
 .full-width { width: 100%; }
 .skip-link { position: fixed; top: -100px; left: 16px; z-index: 4000; background: var(--surface); padding: 12px 20px; border: 2px solid var(--accent); }

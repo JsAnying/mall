@@ -30,5 +30,10 @@ export const useUserStore = defineStore("user", () => {
     userInfo.value = null;
   }
 
-  return { token, userInfo, isLoggedIn, login, logout };
+  function setUserInfo(info) {
+    userInfo.value = info;
+    saveSession(token.value, info);
+  }
+
+  return { token, userInfo, isLoggedIn, login, logout, setUserInfo };
 });
